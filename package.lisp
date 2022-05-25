@@ -1,4 +1,5 @@
 ;;;; package.lisp
 
 (defpackage #:dino-lisp
-  (:use #:cl))
+  (:use #:cl)
+  (:export "GAME-MAIN"))
