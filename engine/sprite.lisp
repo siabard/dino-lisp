@@ -10,7 +10,7 @@
 (defun sprite/set-source-rect (sprite source-rect)
   (setf (sprite-source-rect sprite) source-rect))
 
-(defun sprite/set-source-rect (sprite dest-rect)
+(defun sprite/set-dest-rect (sprite dest-rect)
   (setf (sprite-dest-rect sprite) dest-rect))
 
 (defun sprite/render (sprite renderer)
