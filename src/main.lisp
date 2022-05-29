@@ -7,9 +7,12 @@
 	(sdl2-image:init '(:jpg :png))
 	(let* ((sprite (make-sprite :texture (load-texture renderer "assets/mychar.png")
 				    :source-rect (sdl2:make-rect 0 0 32 32)
-				    :dest-rect (sdl2:make-rect 0 0 32 32))))
+				    :dest-rect (sdl2:make-rect 0 0 32 32)))
+	       (sprite-atlas (make-tile-atlas (sprite-texture sprite) 16 16)))
 	  (sdl2:with-event-loop (:method :poll)
 	    (:idle ()
+		   (sprite/set-source-rect sprite (elt sprite-atlas 0))
+		   (sprite/set-dest-rect sprite (elt sprite-atlas 0))
 		   (sdl2:render-clear renderer)
 		   (sprite/render sprite renderer)
 		   (sdl2:render-present renderer))
@@ -17,3 +20,10 @@
 		   (progn
 		     (sprite/destroy-texture sprite)
 		     t))))))))
+
+
+(defun test-sdl2 ()
+  (sdl2:with-init (:everything)
+    (sdl2:with-window (win :title "test")
+      (sdl2:with-renderer (renderer win)
+	(make-tile-atlas (load-texture renderer "assets/mychar.png") 16 16)))))
