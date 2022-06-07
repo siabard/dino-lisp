@@ -12,6 +12,8 @@
 	       (:module "engine"
 		:components ((:file "renderer")
 			     (:file "sprite")
+			     (:file "global")
+			     (:file "tiled")
 			     (:file "texture")))
 	       (:module "src"
 		:components ((:file "main")))))
