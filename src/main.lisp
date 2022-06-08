@@ -32,3 +32,11 @@
     (sdl2:with-window (win :title "test")
       (sdl2:with-renderer (renderer win)
 	(make-tile-atlas (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root*)) 16 16)))))
+
+(defun test-sdl2-tile ()
+  (sdl2:with-init (:everything)
+    (sdl2:with-window (win :title "test")
+      (sdl2:with-renderer (renderer win)
+	(let* ((map (load-tiled-map (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*)))
+	       (tilesets (cl-tiled:map-tilesets map)))
+	  (make-tile-texture-from-tilesets renderer tilesets))))))
