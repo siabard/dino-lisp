@@ -14,7 +14,7 @@
 
 ;; layer를 어떻게 loading 할 것인가??
 
-(defstruct tiled-map layers atlas-texture-table width height tile-width tile-height)
+(defstruct tiled-map layers atlas-texture-table width height tile-width tile-height cam-x cam-y)
 
 (defun create-tiled-map (renderer path-to-map-file)
   (let ((map-data (load-tiled-map path-to-map-file)))
@@ -34,7 +34,9 @@
 			       :height height
 			       :tile-width tile-width
 			       :tile-height tile-height
-			       :atlas-texture-table atlas-texture-table))))
+			       :atlas-texture-table atlas-texture-table
+			       :cam-x 50
+			       :cam-y 100))))
 	  (t nil))))
 
 ;; make tile atlas from a tileset
@@ -60,7 +62,7 @@
 	(setf (gethash name result) tile-atlas)))
     result))
 
-;; register to tileatlas info 
+;; register to tileatlas info
 (defun make-tile-texture-from-tileset (renderer tileset)
   (let* ((name (cl-tiled:tileset-name tileset))
 	 (tileset-image (cl-tiled:tileset-image tileset))
@@ -105,7 +107,7 @@
 	 (filtered-gids (remove-if-not (lambda (elt) (<= elt layer-gid)) gids))
 	 (found-first-gid (apply #'max filtered-gids))
 	 (filtered-tileset-key (remove-if-not (lambda (lst) (= found-first-gid (cadr lst))) first-gids)))
-    (caar filtered-tileset-key)))
+    filtered-tileset-key))
 
 ;; cell의 row와 column이 출력가능한 영역에 있는지 확인
 (defun cell-is-in-p (column row left top right bottom)
@@ -119,7 +121,16 @@
 
 (defun tiled/render (renderer tiled-map clip-rect)
   "Render map to clip-rect area"
-  (let* ((top (sdl2:rect-y clip-rect))
+  (let* ((layers (tiled-map-layers tiled-map)) )
+    (dolist (layer layers)
+      (unless (search "collision" (cl-tiled:layer-name layer))
+	(tiled/render-layer renderer tiled-map layer clip-rect)))))
+
+
+
+(defun tiled/render-layer (renderer tiled-map layer clip-rect)
+  (let* ((cells (cl-tiled:layer-cells layer))
+	 (top (sdl2:rect-y clip-rect))
 	 (left (sdl2:rect-x clip-rect))
 	 (bottom (+ top (sdl2:rect-height clip-rect)))
 	 (right (+ left (sdl2:rect-width clip-rect)))
@@ -128,23 +139,22 @@
 	 (tile-top (cadr top-left-tile-xy))
 	 (tile-left (car top-left-tile-xy))
 	 (tile-bottom (cadr bottom-right-tile-xy))
-	 (tile-right (car bottom-right-tile-xy))
-	 (layers (tiled-map-layers tiled-map))
-	 (layer (elt layers 0)) ;; 일단 맨 첫번째 레이어만 가지고 테스트하자
-	 (cells (cl-tiled:layer-cells layer)))
+	 (tile-right (car bottom-right-tile-xy)))
     (dolist (cell cells)
       (let ((row (cl-tiled:cell-row cell))
 	    (column (cl-tiled:cell-column cell)))
 	(when (cell-is-in-p column row tile-left tile-top tile-right tile-bottom)
 	  (let* ((gid (cl-tiled:tile-id (cl-tiled:cell-tile  cell)))
-		 (tileset-key (get-tileset-key-from-gid tiled-map gid))
+		 (tileset-result (get-tileset-key-from-gid tiled-map (+  gid 1)))
+		 (tileset-key (caar tileset-result))
+		 (tileset-first-gid (cadar tileset-result))
 		 (texture (tileset-data-texture (gethash tileset-key (tiled-map-atlas-texture-table tiled-map))))
 		 (atlas (tileset-data-atlas (gethash tileset-key (tiled-map-atlas-texture-table tiled-map)))))
 	    (when (> gid 0)
 	      (let ((sprite (make-sprite :texture texture
-					 :source-rect (elt atlas gid )
-					 :dest-rect (sdl2:make-rect (* column (tiled-map-tile-width tiled-map))
-								    (* row (tiled-map-tile-height tiled-map))
+					 :source-rect (elt atlas (+ 1 (- gid tileset-first-gid)) )
+					 :dest-rect (sdl2:make-rect (-  (* column (tiled-map-tile-width tiled-map)) (tiled-map-cam-x tiled-map))
+								    (-  (* row (tiled-map-tile-height tiled-map)) (tiled-map-cam-y tiled-map))
 								    (tiled-map-tile-width tiled-map)
 								    (tiled-map-tile-height tiled-map)))))
 		(sprite/render sprite renderer)))))))))

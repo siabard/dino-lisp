@@ -45,7 +45,7 @@
 		   (sprite/set-source-rect sprite (elt sprite-atlas 3))
 		   (sprite/set-dest-rect sprite (elt sprite-atlas 0))
 		   (sdl2:render-clear renderer)
-		   (tiled/render renderer tiled-map (sdl2:make-rect 0 0 100 100))
+		   (tiled/render renderer tiled-map (sdl2:make-rect 0 0 320 240))
 		   ;(map/render-map-tile stage-map renderer texture sprite-atlas)
 		   ;(sprite/render sprite renderer)
 		   (sdl2:render-present renderer))
