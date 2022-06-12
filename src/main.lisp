@@ -46,8 +46,8 @@
 		   (sprite/set-dest-rect sprite (elt sprite-atlas 0))
 		   (sdl2:render-clear renderer)
 		   (tiled/render renderer tiled-map (sdl2:make-rect 0 0 100 100))
-		   (map/render-map-tile stage-map renderer texture sprite-atlas)
-		   (sprite/render sprite renderer)
+		   ;(map/render-map-tile stage-map renderer texture sprite-atlas)
+		   ;(sprite/render sprite renderer)
 		   (sdl2:render-present renderer))
 	    (:quit ()
 		   (progn
@@ -61,14 +61,6 @@
     (sdl2:with-window (win :title "test")
       (sdl2:with-renderer (renderer win)
 	(make-tile-atlas (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root*)) 16 16)))))
-
-(defun test-sdl2-tile ()
-  (sdl2:with-init (:everything)
-    (sdl2:with-window (win :title "test")
-      (sdl2:with-renderer (renderer win)
-	(let ((tiled-map (create-tiled-map renderer (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*))))
-	  tiled-map)))))
-
 
 (defun test-sdl2-tile ()
   (sdl2:with-init (:everything)

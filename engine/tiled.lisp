@@ -107,6 +107,14 @@
 	 (filtered-tileset-key (remove-if-not (lambda (lst) (= found-first-gid (cadr lst))) first-gids)))
     (caar filtered-tileset-key)))
 
+;; cell의 row와 column이 출력가능한 영역에 있는지 확인
+(defun cell-is-in-p (column row left top right bottom)
+  (and
+   (<= left column)
+   (>= right column)
+   (<= top row)
+   (>= bottom row)))
+
 ;; render map
 
 (defun tiled/render (renderer tiled-map clip-rect)
@@ -121,30 +129,22 @@
 	 (tile-left (car top-left-tile-xy))
 	 (tile-bottom (cadr bottom-right-tile-xy))
 	 (tile-right (car bottom-right-tile-xy))
-	 (tile-width (+ 1 (- tile-right tile-left)))
-	 (tile-height (+ 1 (- tile-bottom tile-top)))
 	 (layers (tiled-map-layers tiled-map))
 	 (layer (elt layers 0)) ;; 일단 맨 첫번째 레이어만 가지고 테스트하자
-	 )
-    (loop for y below tile-height
-	  do (loop for x below tile-width
-		   do (let* ((pos (+ x (* y tile-width)))
-			     (gid (cl-tiled:tile-id (cl-tiled:cell-tile (elt (cl-tiled:layer-cells layer) pos))))
-			     (tileset-key (get-tileset-key-from-gid tiled-map gid))
-			     (texture (tileset-data-texture (gethash tileset-key (tiled-map-atlas-texture-table tiled-map))))
-			     (atlas (tileset-data-atlas (gethash tileset-key (tiled-map-atlas-texture-table tiled-map)))))
-			(when (> gid 0)
-			  (let ((sprite (make-sprite :texture texture
-						     :source-rect (elt atlas gid)
-						     :dest-rect (sdl2:make-rect (* x (tiled-map-tile-width tiled-map))
-										(* y (tiled-map-tile-height tiled-map))
-										(tiled-map-tile-width tiled-map)
-										(tiled-map-tile-height tiled-map)))))
-			    (sprite/render sprite renderer))))))))
-
-
-
-;; Tile의 용례가 다르다.
-;; cl-tiled:tile-column, cl-tiled:tile-row 에 좌표값이 들어가 있다.
-;; cl-tiled:layer-cells 를 전부 돌려서 해당 clip-rect 안에 들어가있는지 찾고
-;; 이를 바탕으로 출력하도록 해야할 것 같음
+	 (cells (cl-tiled:layer-cells layer)))
+    (dolist (cell cells)
+      (let ((row (cl-tiled:cell-row cell))
+	    (column (cl-tiled:cell-column cell)))
+	(when (cell-is-in-p column row tile-left tile-top tile-right tile-bottom)
+	  (let* ((gid (cl-tiled:tile-id (cl-tiled:cell-tile  cell)))
+		 (tileset-key (get-tileset-key-from-gid tiled-map gid))
+		 (texture (tileset-data-texture (gethash tileset-key (tiled-map-atlas-texture-table tiled-map))))
+		 (atlas (tileset-data-atlas (gethash tileset-key (tiled-map-atlas-texture-table tiled-map)))))
+	    (when (> gid 0)
+	      (let ((sprite (make-sprite :texture texture
+					 :source-rect (elt atlas gid )
+					 :dest-rect (sdl2:make-rect (* column (tiled-map-tile-width tiled-map))
+								    (* row (tiled-map-tile-height tiled-map))
+								    (tiled-map-tile-width tiled-map)
+								    (tiled-map-tile-height tiled-map)))))
+		(sprite/render sprite renderer)))))))))
