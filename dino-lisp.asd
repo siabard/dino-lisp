@@ -17,6 +17,8 @@
 			     (:file "util")
 			     (:file "map_tile")
 			     (:file "tile_atlas")
-			     (:file "texture")))
+			     (:file "texture")
+			     (:file "key")
+			     (:file "mouse")))
 	       (:module "src"
 		:components ((:file "main")))))

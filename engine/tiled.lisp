@@ -126,7 +126,17 @@
       (unless (search "collision" (cl-tiled:layer-name layer))
 	(tiled/render-layer renderer tiled-map layer clip-rect)))))
 
+;; map의 cam 좌표 이동하기
 
+(defun tiled/update-keys (tiled-map keys)
+  (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-left))
+    (decf (tiled-map-cam-x tiled-map)))
+  (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-right))
+    (incf (tiled-map-cam-x tiled-map)))
+  (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-up))
+    (decf (tiled-map-cam-y tiled-map)))
+  (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-down))
+    (incf (tiled-map-cam-y tiled-map))))
 
 (defun tiled/render-layer (renderer tiled-map layer clip-rect)
   (let* ((cells (cl-tiled:layer-cells layer))
