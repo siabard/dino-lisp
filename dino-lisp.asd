@@ -12,6 +12,11 @@
 	       (:module "engine"
 		:components ((:file "renderer")
 			     (:file "sprite")
+			     (:file "global")
+			     (:file "tiled")
+			     (:file "util")
+			     (:file "map_tile")
+			     (:file "tile_atlas")
 			     (:file "texture")))
 	       (:module "src"
 		:components ((:file "main")))))
