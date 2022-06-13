@@ -127,6 +127,12 @@
 	(tiled/render-layer renderer tiled-map layer clip-rect)))))
 
 ;; map의 cam 좌표 이동하기
+(defun tiled/goto (tiled-map x y)
+  (setf (tiled-map-cam-x tiled-map) x)
+  (setf (tiled-map-cam-y tiled-map) y))
+
+
+;; key 설정
 
 (defun tiled/update-keys (tiled-map keys)
   (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-left))
