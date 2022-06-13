@@ -18,6 +18,7 @@
 			     (:file "map_tile")
 			     (:file "tile_atlas")
 			     (:file "texture")
+			     (:file "entity")
 			     (:file "key")
 			     (:file "mouse")))
 	       (:module "src"

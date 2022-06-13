@@ -9,15 +9,15 @@
 	
 	(let* ((texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root* )))
 	       (tiled-map (create-tiled-map renderer (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*)))
-	       (sprite (make-sprite :texture texture
-				    :source-rect (sdl2:make-rect 0 0 32 32)
-				    :dest-rect (sdl2:make-rect 0 0 32 32)))
-	       (sprite-atlas (make-tile-atlas texture 16 16))
-	       (stage-map (make-map-tile :width 16 :height 16))
+	       (hero (make-entity :texture texture
+				  :width 16
+				  :height 16
+				  :x 0
+				  :y 0))
 	       (keys (make-instance 'key-input))
 	       (mouse-state (make-mouse-system)))
-	  (map/set-map-tile-layer stage-map 16 16)
 	  (init-keys keys)
+	  (entity/make-entity-atlas hero)
 	  (sdl2:with-event-loop (:method :poll)
 	    (:mousebuttonup (:button button)
 			    (cond ((= button 1)
@@ -39,18 +39,16 @@
 			 (t
 			  (progn
 			    (update-mouses mouse-state)
-			    (sprite/set-source-rect sprite (elt sprite-atlas 3))
-			    (sprite/set-dest-rect sprite (elt sprite-atlas 0))
 			    (sdl2:render-clear renderer)
 			    (tiled/update-keys tiled-map keys)
 			    (tiled/render renderer tiled-map (sdl2:make-rect 0 0 320 240))
-			    (map/render-map-tile stage-map renderer texture sprite-atlas)
-			    (sprite/render sprite renderer)
+			    (entity/render hero renderer)
 			    (sdl2:render-present renderer)
 			    (clear-keys keys)))))
 	    (:quit ()
 		   (progn
-		     (sprite/destroy-texture sprite)
+		     (entity/destroy-texture hero)
+		     (tiled/destroy-texture tiled-map)
 		     t))))))))
 
 

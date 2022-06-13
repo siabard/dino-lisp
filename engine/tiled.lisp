@@ -174,3 +174,10 @@
 								    (tiled-map-tile-width tiled-map)
 								    (tiled-map-tile-height tiled-map)))))
 		(sprite/render sprite renderer)))))))))
+
+
+(defun tiled/destroy-texture (tiled-map)
+  (let ((texture-table (tiled-map-atlas-texture-table tiled-map)))
+    (loop for k being the hash-keys in texture-table using (hash-value v)
+	  do (let ((texture (tileset-data-texture v)))
+	       (sdl2:destroy-texture texture)))))
