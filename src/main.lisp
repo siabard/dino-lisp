@@ -41,6 +41,8 @@
 			    (update-mouses mouse-state)
 			    (sdl2:render-clear renderer)
 			    (entity/update-input hero keys mouse-state)
+			    (multiple-value-bind (cam-x cam-y) (tiled/clip-xy tiled-map (entity-x hero) (entity-y hero))
+			      (tiled/goto tiled-map cam-x cam-y))
 			    (tiled/render renderer tiled-map (sdl2:make-rect 0 0 320 240))
 			    (entity/render hero renderer)
 			    (sdl2:render-present renderer)

@@ -176,8 +176,33 @@
 		(sprite/render sprite renderer)))))))))
 
 
+;; Clipping x y according to tiled-map
+(defun tiled/clip-xy (tiled-map x y)
+  (let* ((cam-margin 64)
+	 (cam-width  (* (tiled-map-width tiled-map)
+			(tiled-map-tile-width tiled-map)))
+	 (cam-height (* (tiled-map-height tiled-map)
+			(tiled-map-tile-height tiled-map)))
+	 (cam-left   (tiled-map-cam-x tiled-map))
+	 (cam-top    (tiled-map-cam-y tiled-map))
+	 (cam-right  (+ cam-left cam-width))
+	 (cam-bottom (+ cam-top  cam-height))
+	 (cam-left-margin   (+ cam-left   cam-margin))
+	 (cam-top-margin    (+ cam-top    cam-margin))
+	 (cam-right-margin  (- cam-right  cam-margin))
+	 (cam-bottom-margin (- cam-bottom cam-margin))
+	 (result-x cam-left)
+	 (result-y cam-top))
+    (cond ((< x cam-left-margin)   (decf result-x (- cam-left-margin x)))
+	  ((> x cam-right-margin)  (incf result-x (- x cam-right-margin)))
+	  ((< y cam-top-margin)    (decf result-y (- cam-top-margin y)))
+	  ((> y cam-bottom-margin) (incf result-y (- y cam-bottom-margin))))
+    (values result-x result-y)))
+
+
 (defun tiled/destroy-texture (tiled-map)
   (let ((texture-table (tiled-map-atlas-texture-table tiled-map)))
     (loop for k being the hash-keys in texture-table using (hash-value v)
 	  do (let ((texture (tileset-data-texture v)))
 	       (sdl2:destroy-texture texture)))))
+
