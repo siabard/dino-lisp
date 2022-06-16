@@ -169,20 +169,20 @@
 	    (when (> gid 0)
 	      (let ((sprite (make-sprite :texture texture
 					 :source-rect (elt atlas (+ 1 (- gid tileset-first-gid)) )
-					 :dest-rect (sdl2:make-rect (-  (* column (tiled-map-tile-width tiled-map)) (tiled-map-cam-x tiled-map))
-								    (-  (* row (tiled-map-tile-height tiled-map)) (tiled-map-cam-y tiled-map))
+					 :dest-rect (sdl2:make-rect (-  (* column (tiled-map-tile-width tiled-map))
+									(tiled-map-cam-x tiled-map))
+								    (-  (* row (tiled-map-tile-height tiled-map))
+									(tiled-map-cam-y tiled-map))
 								    (tiled-map-tile-width tiled-map)
 								    (tiled-map-tile-height tiled-map)))))
 		(sprite/render sprite renderer)))))))))
 
 
 ;; Clipping x y according to tiled-map
-(defun tiled/clip-xy (tiled-map x y)
+(defun tiled/clip-xy (tiled-map x y w h)
   (let* ((cam-margin 64)
-	 (cam-width  (* (tiled-map-width tiled-map)
-			(tiled-map-tile-width tiled-map)))
-	 (cam-height (* (tiled-map-height tiled-map)
-			(tiled-map-tile-height tiled-map)))
+	 (cam-width  w)
+	 (cam-height h)
 	 (cam-left   (tiled-map-cam-x tiled-map))
 	 (cam-top    (tiled-map-cam-y tiled-map))
 	 (cam-right  (+ cam-left cam-width))

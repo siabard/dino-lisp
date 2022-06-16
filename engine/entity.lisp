@@ -59,14 +59,15 @@
   (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-down))
     (incf (entity-y entity))))
 
-(defun entity/render (entity renderer)
+(defun entity/render (entity renderer cam-x cam-y)
   (let* ((current-frame (entity-current-frame entity))
 	 (current-animation (entity-current-animation entity))
 	 (animation-map (entity-animation-map entity))
 	 (animation-frames (gethash current-animation animation-map))
 	 (pos (elt animation-frames current-frame))
 	 (source-rect (elt (entity-atlas entity) pos))
-	 (dest-rect (sdl2:make-rect (entity-x entity) (entity-y entity)
+	 (dest-rect (sdl2:make-rect (-  (entity-x entity) cam-x)
+				    (-  (entity-y entity) cam-y)
 				    (entity-width entity) (entity-height entity))))
     (sdl2:render-copy-ex renderer (entity-texture entity)
 			 :source-rect source-rect
