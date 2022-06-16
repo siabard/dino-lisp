@@ -35,8 +35,8 @@
 			       :tile-width tile-width
 			       :tile-height tile-height
 			       :atlas-texture-table atlas-texture-table
-			       :cam-x 50
-			       :cam-y 100))))
+			       :cam-x 0
+			       :cam-y 0))))
 	  (t nil))))
 
 ;; make tile atlas from a tileset
@@ -193,10 +193,10 @@
 	 (cam-bottom-margin (- cam-bottom cam-margin))
 	 (result-x cam-left)
 	 (result-y cam-top))
-    (cond ((< x cam-left-margin)   (decf result-x (- cam-left-margin x)))
-	  ((> x cam-right-margin)  (incf result-x (- x cam-right-margin)))
-	  ((< y cam-top-margin)    (decf result-y (- cam-top-margin y)))
-	  ((> y cam-bottom-margin) (incf result-y (- y cam-bottom-margin))))
+    (when (< x cam-left-margin)   (decf result-x (- cam-left-margin x)))
+    (when (> x cam-right-margin)  (incf result-x (- x cam-right-margin)))
+    (when (< y cam-top-margin)    (decf result-y (- cam-top-margin y)))
+    (when (> y cam-bottom-margin) (incf result-y (- y cam-bottom-margin)))
     (values result-x result-y)))
 
 
