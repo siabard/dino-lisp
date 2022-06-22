@@ -8,7 +8,6 @@
       (sdl2:with-window (win :title "Dinodeck" :flags '(:shown) :w 800 :h 600)
 	(sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	  (sdl2-image:init '(:jpg :png))
-	  
 	  (let* ((current-time (sdl2:get-ticks))
 		 (texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root* )))
 		 (tiled-map (create-tiled-map renderer (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*)))
@@ -17,6 +16,8 @@
 				    :height 16
 				    :x 0
 				    :y 0
+				    :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0)
+				    :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0)
 				    :elapsed-time 0
 				    :animation-span 30
 				    :current-animation ""
@@ -27,6 +28,7 @@
 	    (entity/make-entity-atlas hero)
 	    (entity/make-animation-map hero)
 	    (entity/add-animation hero "walk-left" (list 0 1 2))
+	    ;;(entity/add-animation hero "idle" (list 0))
 	    (setf (entity-current-animation hero) "walk-left")
 	    (sdl2:with-event-loop (:method :poll)
 	      (:mousebuttonup (:button button)
