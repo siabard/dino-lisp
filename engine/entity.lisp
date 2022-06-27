@@ -87,11 +87,11 @@
 	  (t (setf (entity-elapsed-time entity) next-elapsed-time)))))
 
 
-(defun entity/update-dt (entity dt)
+(defun entity/update-dt-normal (entity dt)
   (entity/increase-elapsed-time-dt entity dt))
 
 
-(defun entity/update-input (entity keys mouses)
+(defun entity/update-input-normal (entity keys mouses)
   (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-left))
     (decf (entity-x entity) 4))
   (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-right))
@@ -104,7 +104,7 @@
 
 ;; dx, dy 값에 따라 x, y 값을 변화시킨다.
 ;; dx, dy 는 자연적으로 감소해야한다.
-(defun entity/update-dt-tween (entity dt)
+(defun entity/update-dt (entity dt)
   (let ((delta-x (tween/linear (entity-dx entity)))
 	(delta-y (tween/linear (entity-dy entity))))
     (incf (entity-x entity) delta-x)
@@ -115,27 +115,27 @@
 
 ;; 키보드 값이 눌리면 dx, dy 값을 변화시킨다.
 ;; 최대값은 400이다.
-(defun entity/update-input-tween (entity keys mouses)
+(defun entity/update-input (entity keys mouses)
   (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-left))
-    (decf (tween-end (entity-dx entity)) 4)
+    (decf (tween-start (entity-dx entity)) 0.1)
     (setf (tween-timespan (entity-dx entity)) 100)
     (setf (tween-current-time (entity-dx entity)) 0))
   (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-right))
-    (incf (tween-end (entity-dx entity)) 4)
+    (incf (tween-start (entity-dx entity)) 0.1)
     (setf (tween-timespan (entity-dx entity)) 100)
     (setf (tween-current-time (entity-dx entity)) 0))
   (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-up))
-    (decf (tween-end (entity-dy entity)) 4)
-    (setf (tween-timespan (entity-dx entity)) 100)
-    (setf (tween-current-time (entity-dx entity)) 0))
+    (decf (tween-start (entity-dy entity)) 0.1)
+    (setf (tween-timespan (entity-dy entity)) 100)
+    (setf (tween-current-time (entity-dy entity)) 0))
   (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-down))
-    (incf (tween-end (entity-dy entity)) 4)
-    (setf (tween-timespan (entity-dx entity)) 100)
-    (setf (tween-current-time (entity-dx entity)) 0))
-  (cond ((< 40 (tween-end (entity-dx entity))) (setf (tween-end (entity-dx entity)) 40))
-	((> -40 (tween-end  (entity-dx entity))) (setf (tween-end  (entity-dx entity)) -40)))
-  (cond ((< 40 (tween-end  (entity-dy entity))) (setf (tween-end  (entity-dy entity)) 40))
-	((> -40 (tween-end  (entity-dy entity))) (setf (tween-end  (entity-dy entity)) -40))))
+    (incf (tween-start (entity-dy entity)) 0.1)
+    (setf (tween-timespan (entity-dy entity)) 100)
+    (setf (tween-current-time (entity-dy entity)) 0))
+  (cond ((< 40 (tween-start (entity-dx entity))) (setf (tween-start (entity-dx entity)) 40))
+	((> -40 (tween-start  (entity-dx entity))) (setf (tween-start  (entity-dx entity)) -40)))
+  (cond ((< 40 (tween-start  (entity-dy entity))) (setf (tween-start  (entity-dy entity)) 40))
+	((> -40 (tween-start  (entity-dy entity))) (setf (tween-start  (entity-dy entity)) -40))))
 
 (defun entity/render (entity renderer cam-x cam-y)
   (let* ((current-frame (entity-current-frame entity))

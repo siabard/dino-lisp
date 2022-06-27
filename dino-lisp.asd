@@ -5,7 +5,7 @@
   :author "Yeonho Jang <siabard@gmail.com>"
   :license  "MIT"
   :version "0.0.1"
-  :depends-on ("sdl2" "sdl2-image" "sdl2-mixer" "sdl2-ttf" "cl-tiled")
+  :depends-on ("sdl2" "sdl2-image" "sdl2-ttf" "cl-tiled")
   :serial t
   :components ((:file "package")
                (:file "dino-lisp")	       
