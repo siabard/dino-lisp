@@ -28,7 +28,7 @@
 	    (entity/make-entity-atlas hero)
 	    (entity/make-animation-map hero)
 	    (entity/add-animation hero "walk-left" (list 0 1 2))
-	    ;;(entity/add-animation hero "idle" (list 0))
+	    (entity/add-animation hero "idle" (list 0))
 	    (setf (entity-current-animation hero) "walk-left")
 	    (sdl2:with-event-loop (:method :poll)
 	      (:mousebuttonup (:button button)

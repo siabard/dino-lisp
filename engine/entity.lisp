@@ -76,6 +76,7 @@
     (setf (entity-current-frame entity) new-current-frame)))
 
 ;; dt의 변화에 따른 entity내 변화
+;; animation 처리
 (defun entity/increase-elapsed-time-dt (entity dt)
   (let* ((elapsed-time (entity-elapsed-time entity))
 	 (next-elapsed-time (+ elapsed-time dt))
@@ -102,6 +103,22 @@
     (incf (entity-y entity) 4)))
 
 
+
+;; 벡터의 내적
+(defun inner-product (x y)
+  (+ (* x x) (* y y)))
+
+;; animation이 바뀔 때 기존과 다르다면, frame을 0으로 리셋해야한다.
+;; dx , dy 가 0 이상이면 일단 walk-left
+;; dx , dy 가 0이면 idle
+
+(defun entity/change-animation (entity animation)
+  (let ((current-animation (entity-current-animation entity)))
+    (when (not (equal current-animation animation ))
+      (setf (entity-current-animation entity) animation)
+      (setf (entity-current-frame entity) 0))))
+
+
 ;; dx, dy 값에 따라 x, y 값을 변화시킨다.
 ;; dx, dy 는 자연적으로 감소해야한다.
 (defun entity/update-dt (entity dt)
@@ -111,6 +128,9 @@
     (incf (entity-y entity) delta-y)
     (tween/update-dt (entity-dx entity) dt)
     (tween/update-dt (entity-dy entity) dt)
+    (cond ((> (inner-product delta-x delta-y) 0)
+	   (entity/change-animation entity "walk-left"))
+	  (t (entity/change-animation entity "idle")))
     (entity/increase-elapsed-time-dt entity dt)))
 
 ;; 키보드 값이 눌리면 dx, dy 값을 변화시킨다.
