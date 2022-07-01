@@ -1,8 +1,9 @@
 (in-package #:dino-lisp)
 
+;;;; Entity 객체 시스템
+;;;; TODO 초당 움직여야하는 수치(초당 60픽셀)를 이용해서
+;;;; 단위 dt 당 변이값을 갖도록 한다.
 
-;; TODO Tween 으로 dx, dy 를 감쇄시킬 것
-;; tween 객체를 생성하고, 시간이 0이 되면 그냥 nil로 만들까?
 (defstruct tween start end timespan current-time)
 
 ;; t : 0~1
@@ -36,13 +37,15 @@
     (setf (tween-timespan tw) 0)
     (setf (tween-current-time tw) 0)))
 
-;; 이동 감쇄량
+;; 이동 감쇄량 (초당)
 (defconstant +movement-friction+ 20)
 
 
 (defstruct entity
   texture width height atlas x y
   dx dy
+  maxspeed
+  friction
   elapsed-time
   animation-span
   current-animation
@@ -136,26 +139,30 @@
 ;; 키보드 값이 눌리면 dx, dy 값을 변화시킨다.
 ;; 최대값은 400이다.
 (defun entity/update-input (entity keys mouses)
-  (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-left))
-    (decf (tween-start (entity-dx entity)) 0.1)
-    (setf (tween-timespan (entity-dx entity)) 100)
-    (setf (tween-current-time (entity-dx entity)) 0))
-  (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-right))
-    (incf (tween-start (entity-dx entity)) 0.1)
-    (setf (tween-timespan (entity-dx entity)) 100)
-    (setf (tween-current-time (entity-dx entity)) 0))
-  (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-up))
-    (decf (tween-start (entity-dy entity)) 0.1)
-    (setf (tween-timespan (entity-dy entity)) 100)
-    (setf (tween-current-time (entity-dy entity)) 0))
-  (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-down))
-    (incf (tween-start (entity-dy entity)) 0.1)
-    (setf (tween-timespan (entity-dy entity)) 100)
-    (setf (tween-current-time (entity-dy entity)) 0))
-  (cond ((< 40 (tween-start (entity-dx entity))) (setf (tween-start (entity-dx entity)) 40))
-	((> -40 (tween-start  (entity-dx entity))) (setf (tween-start  (entity-dx entity)) -40)))
-  (cond ((< 40 (tween-start  (entity-dy entity))) (setf (tween-start  (entity-dy entity)) 40))
-	((> -40 (tween-start  (entity-dy entity))) (setf (tween-start  (entity-dy entity)) -40))))
+  (let* ((maxspeed  (entity-maxspeed  entity))
+	 (-maxspeed (* -1 maxspeed))
+	 (dx        (entity-dx entity))
+	 (dy        (entity-dy entity)))
+    (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-left))
+      (decf (tween-start dx)        0.1)
+      (setf (tween-timespan dx)     100)
+      (setf (tween-current-time dx) 0))
+    (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-right))
+      (incf (tween-start dx)        0.1)
+      (setf (tween-timespan dx)     100)
+      (setf (tween-current-time dx) 0))
+    (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-up))
+      (decf (tween-start dy)        0.1)
+      (setf (tween-timespan dy)     100)
+      (setf (tween-current-time dy) 0))
+    (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-down))
+      (incf (tween-start dy)        0.1)
+      (setf (tween-timespan dy)     100)
+      (setf (tween-current-time dy) 0))
+    (cond ((< maxspeed  (tween-start dx)) (setf (tween-start dx)  maxspeed))
+	  ((> -maxspeed (tween-start dx)) (setf (tween-start dx) -maxspeed)))
+    (cond ((< maxspeed  (tween-start dy)) (setf (tween-start dy)  maxspeed))
+	  ((> -maxspeed (tween-start dy)) (setf (tween-start dy) -maxspeed)))))
 
 (defun entity/render (entity renderer cam-x cam-y)
   (let* ((current-frame (entity-current-frame entity))

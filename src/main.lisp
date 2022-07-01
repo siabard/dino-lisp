@@ -18,6 +18,7 @@
 				    :y 0
 				    :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0)
 				    :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0)
+				    :maxspeed 40
 				    :elapsed-time 0
 				    :animation-span 30
 				    :current-animation ""
