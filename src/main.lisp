@@ -55,7 +55,8 @@
 				(update-mouses mouse-state)
 				(sdl2:render-clear renderer)
 				(entity/update-input hero keys mouse-state)
-				(entity/update-dt hero dt)
+				(when  (entity/can-goto-p hero tiled-map)
+				  (entity/update-dt hero dt))
 				(multiple-value-bind (cam-x cam-y)
 				    (tiled/clip-xy tiled-map (entity-x hero) (entity-y hero) camera-width camera-height)
 				  (tiled/goto tiled-map cam-x cam-y)
@@ -82,6 +83,7 @@
 (defun test-sdl2-tile ()
   (sdl2:with-init (:everything)
     (sdl2:with-window (win :title "test")
+
       (sdl2:with-renderer (renderer win)
 	(let ((tiled-map (create-tiled-map renderer (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*))))
 	  tiled-map)))))

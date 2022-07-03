@@ -92,10 +92,24 @@
 
 
 ;; translate coordinate to map tile position
-(defun tiled/get-tile-xy (tiled-map x y)
+(defun tiled/coord-to-tile-position (tiled-map x y)
   (let ((tile-width (tiled-map-tile-width tiled-map))
 	(tile-height (tiled-map-tile-height tiled-map)))
     (list (floor x tile-width) (floor y tile-height))))
+
+;; get tile layer's value
+(defun tiled/cell-at-xy-in (tiled-map layer x y)
+  (let* ((position  (tiled/coord-to-tile-position tiled-map x y))
+	 (col       (car  position))
+	 (row       (cadr position))
+	 (layers    (tiled-map-layers tiled-map))
+	 (map-layer (find-if (lambda (l) (equal (cl-tiled:layer-name l) layer)) layers)))
+    (when map-layer
+      (let* ((cells (cl-tiled:layer-cells map-layer))
+	     (row-cells (remove-if-not (lambda (cell) (= row (cl-tiled:cell-row cell))) cells))
+	     (col-cells (cond (row-cells  (remove-if-not (lambda (cell) (= col (cl-tiled:cell-column cell))) row-cells))
+			      (t nil))))
+	col-cells))))
 
 
 ;; get hash key from gid
@@ -123,7 +137,7 @@
   "Render map to clip-rect area"
   (let* ((layers (tiled-map-layers tiled-map)) )
     (dolist (layer layers)
-      (unless (search "collision" (cl-tiled:layer-name layer))
+      (unless (search "collision----" (cl-tiled:layer-name layer))
 	(tiled/render-layer renderer tiled-map layer clip-rect)))))
 
 ;; map의 cam 좌표 이동하기
@@ -150,8 +164,8 @@
 	 (left (sdl2:rect-x clip-rect))
 	 (bottom (+ top (sdl2:rect-height clip-rect)))
 	 (right (+ left (sdl2:rect-width clip-rect)))
-	 (top-left-tile-xy (tiled/get-tile-xy tiled-map left top))
-	 (bottom-right-tile-xy (tiled/get-tile-xy tiled-map right bottom))
+	 (top-left-tile-xy (tiled/coord-to-tile-position tiled-map left top))
+	 (bottom-right-tile-xy (tiled/coord-to-tile-position  tiled-map right bottom))
 	 (tile-top (cadr top-left-tile-xy))
 	 (tile-left (car top-left-tile-xy))
 	 (tile-bottom (cadr bottom-right-tile-xy))

@@ -121,7 +121,6 @@
       (setf (entity-current-animation entity) animation)
       (setf (entity-current-frame entity) 0))))
 
-
 ;; dx, dy 값에 따라 x, y 값을 변화시킨다.
 ;; dx, dy 는 자연적으로 감소해야한다.
 (defun entity/update-dt (entity dt)
@@ -135,6 +134,7 @@
 	   (entity/change-animation entity "walk-left"))
 	  (t (entity/change-animation entity "idle")))
     (entity/increase-elapsed-time-dt entity dt)))
+
 
 ;; 키보드 값이 눌리면 dx, dy 값을 변화시킨다.
 ;; 최대값은 400이다.
@@ -180,3 +180,15 @@
 
 (defun entity/destroy-texture (entity)
   (sdl2:destroy-texture (entity-texture entity)))
+
+
+(defun entity/can-goto-p (entity tiled-map)
+  (let* ((entity-left   (entity-x entity))
+	 (entity-top    (entity-y entity))
+	 (entity-right  (+ (entity-x entity) (entity-width  entity)))
+	 (entity-bottom (+ (entity-y entity) (entity-height entity)))
+	 (collision-top-left  (tiled/cell-at-xy-in tiled-map "collision" entity-left  entity-top))
+	 (collision-top-right (tiled/cell-at-xy-in tiled-map "collision" entity-right entity-top))
+	 (collision-bottom-left  (tiled/cell-at-xy-in tiled-map "collision" entity-left  entity-bottom))
+	 (collision-bottom-right (tiled/cell-at-xy-in tiled-map "collision" entity-right entity-bottom)))
+    (not  (or collision-top-left collision-top-right collision-bottom-left collision-bottom-right))))
