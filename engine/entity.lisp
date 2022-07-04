@@ -27,22 +27,24 @@
     (>=  current-time timespan)))
 
 
+;; tween 종료
+(defun tween/stop (tw)
+  (setf (tween-start tw)        0)
+  (setf (tween-end tw)          0)
+  (setf (tween-timespan tw)     0)
+  (setf (tween-current-time tw) 0))
+
 ;; time 증가
 ;; 종료확인하여 종료되면 tween 멈춤
 (defun tween/update-dt (tw dt)
   (incf (tween-current-time tw) dt)
   (when (tween/end-p tw)
-    (setf (tween-start tw) 0)
-    (setf (tween-end tw) 0)
-    (setf (tween-timespan tw) 0)
-    (setf (tween-current-time tw) 0)))
-
-;; 이동 감쇄량 (초당)
-(defconstant +movement-friction+ 20)
+    (tween/stop tw)))
 
 
 (defstruct entity
   texture width height atlas x y
+  new-x new-y
   dx dy
   maxspeed
   friction
@@ -121,13 +123,20 @@
       (setf (entity-current-animation entity) animation)
       (setf (entity-current-frame entity) 0))))
 
+
+;; 현재 프레임에서의 위치를 설정한다.
 ;; dx, dy 값에 따라 x, y 값을 변화시킨다.
-;; dx, dy 는 자연적으로 감소해야한다.
+
+(defun entity/pre-update-dt (entity)
+  (let ((delta-x (tween/linear (entity-dx entity)))
+	(delta-y (tween/linear (entity-dy entity))))
+    (incf (entity-new-x entity) delta-x)
+    (incf (entity-new-y entity) delta-y)))
+
+;; dx, dy 는 tween에 맞추어 변이한다.
 (defun entity/update-dt (entity dt)
   (let ((delta-x (tween/linear (entity-dx entity)))
 	(delta-y (tween/linear (entity-dy entity))))
-    (incf (entity-x entity) delta-x)
-    (incf (entity-y entity) delta-y)
     (tween/update-dt (entity-dx entity) dt)
     (tween/update-dt (entity-dy entity) dt)
     (cond ((> (inner-product delta-x delta-y) 0)
@@ -182,13 +191,19 @@
   (sdl2:destroy-texture (entity-texture entity)))
 
 
-(defun entity/can-goto-p (entity tiled-map)
-  (let* ((entity-left   (entity-x entity))
-	 (entity-top    (entity-y entity))
-	 (entity-right  (+ (entity-x entity) (entity-width  entity)))
-	 (entity-bottom (+ (entity-y entity) (entity-height entity)))
+;; map collision 영역과 부딪혔을 때 움직이지못하도록 처리
+(defun entity/collide-with-tiled-map (entity tiled-map)
+  (let* ((entity-left   (entity-new-x entity))
+	 (entity-top    (entity-new-y entity))
+	 (entity-right  (+ (entity-new-x entity) (entity-width  entity)))
+	 (entity-bottom (+ (entity-new-y entity) (entity-height entity)))
 	 (collision-top-left  (tiled/cell-at-xy-in tiled-map "collision" entity-left  entity-top))
 	 (collision-top-right (tiled/cell-at-xy-in tiled-map "collision" entity-right entity-top))
 	 (collision-bottom-left  (tiled/cell-at-xy-in tiled-map "collision" entity-left  entity-bottom))
 	 (collision-bottom-right (tiled/cell-at-xy-in tiled-map "collision" entity-right entity-bottom)))
-    (not  (or collision-top-left collision-top-right collision-bottom-left collision-bottom-right))))
+    (cond ((not (or collision-top-left collision-top-right collision-bottom-left collision-bottom-right))
+	   (progn  (setf (entity-x entity) (entity-new-x entity))
+		   (setf (entity-y entity) (entity-new-y entity))))
+	  (t (progn
+	       (tween/stop (entity-dx entity))
+	       (tween/stop (entity-dy entity)))))))

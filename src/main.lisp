@@ -16,6 +16,8 @@
 				    :height 16
 				    :x 0
 				    :y 0
+				    :new-x 0
+				    :new-y 0
 				    :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0)
 				    :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0)
 				    :maxspeed 40
@@ -55,8 +57,9 @@
 				(update-mouses mouse-state)
 				(sdl2:render-clear renderer)
 				(entity/update-input hero keys mouse-state)
-				(when  (entity/can-goto-p hero tiled-map)
-				  (entity/update-dt hero dt))
+				(entity/pre-update-dt hero)
+				(entity/collide-with-tiled-map hero tiled-map)
+				(entity/update-dt hero dt)
 				(multiple-value-bind (cam-x cam-y)
 				    (tiled/clip-xy tiled-map (entity-x hero) (entity-y hero) camera-width camera-height)
 				  (tiled/goto tiled-map cam-x cam-y)
