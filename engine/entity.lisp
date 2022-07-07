@@ -130,8 +130,8 @@
 (defun entity/pre-update-dt (entity)
   (let ((delta-x (tween/linear (entity-dx entity)))
 	(delta-y (tween/linear (entity-dy entity))))
-    (incf (entity-new-x entity) delta-x)
-    (incf (entity-new-y entity) delta-y)))
+    (setf (entity-new-x entity) (+ (entity-x entity) delta-x))
+    (setf (entity-new-y entity) (+ (entity-y entity) delta-y))))
 
 ;; dx, dy 는 tween에 맞추어 변이한다.
 (defun entity/update-dt (entity dt)
