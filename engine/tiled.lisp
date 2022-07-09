@@ -97,6 +97,12 @@
 	(tile-height (tiled-map-tile-height tiled-map)))
     (list (floor x tile-width) (floor y tile-height))))
 
+;; translate map tile position to coordinate
+(defun tiled/tile-position-to-coord (tiled-map col row)
+  (let ((tile-width (tiled-map-tile-width tiled-map))
+	(tile-height (tiled-map-tile-height tiled-map)))
+    (list (* tile-width col) (* tile-height row))))
+
 ;; get tile layer's value
 (defun tiled/cell-at-xy-in (tiled-map layer x y)
   (let* ((position  (tiled/coord-to-tile-position tiled-map x y))

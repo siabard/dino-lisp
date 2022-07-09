@@ -207,3 +207,11 @@
 	  (t (progn
 	       (tween/stop (entity-dx entity))
 	       (tween/stop (entity-dy entity)))))))
+
+
+
+;; tiled-map 의 (col, row)위치로 entity를 이동시킴
+(defun entity/teleport (entity tiled-map col row)
+  (let ((coord (tiled/tile-position-to-coord tiled-map col row)))
+    (setf (entity-x entity) (car coord))
+    (setf (entity-y entity) (cadr coord))))
