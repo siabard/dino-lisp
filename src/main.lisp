@@ -26,6 +26,7 @@
 				    :current-animation ""
 				    :current-frame 0))
 		 (up-door-teleport (action/teleport tiled-map 11 7))
+		 (down-door-teleport (action/teleport tiled-map 10 8))
 		 (keys (make-instance 'key-input))
 		 (mouse-state (make-mouse-system)))
 	    (init-keys keys)
@@ -54,10 +55,7 @@
 		       (cond ((key-pressed-p keys (sdl2:scancode-key-to-value :scancode-escape))
 			      (sdl2:push-event :quit))
 			     ((key-pressed-p keys (sdl2:scancode-key-to-value :scancode-space))
-			      (format t "~A~%" up-door-teleport)
 			      (apply up-door-teleport (list nil hero))))
-
-
 		       (update-mouses mouse-state)
 		       (sdl2:render-clear renderer)
 		       (entity/update-input hero keys mouse-state)

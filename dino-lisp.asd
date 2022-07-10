@@ -20,6 +20,8 @@
 			     (:file "texture")
 			     (:file "entity")
 			     (:file "key")
+			     (:file "actions")
+			     (:file "triggers")
 			     (:file "mouse")))
 	       (:module "src"
 		:components ((:file "main")))))
