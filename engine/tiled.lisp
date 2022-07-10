@@ -14,7 +14,7 @@
 
 ;; layer를 어떻게 loading 할 것인가??
 
-(defstruct tiled-map layers atlas-texture-table width height tile-width tile-height cam-x cam-y)
+(defstruct tiled-map layers atlas-texture-table width height tile-width tile-height cam-x cam-y triggers)
 
 (defun create-tiled-map (renderer path-to-map-file)
   (let ((map-data (load-tiled-map path-to-map-file)))
@@ -35,6 +35,7 @@
 			       :tile-width tile-width
 			       :tile-height tile-height
 			       :atlas-texture-table atlas-texture-table
+			       :triggers (make-hash-table)
 			       :cam-x 0
 			       :cam-y 0))))
 	  (t nil))))
@@ -90,6 +91,10 @@
 	  do (setf (tileset-data-texture (gethash k result)) (tileset-data-texture v)))
     result))
 
+;; tile index in tiled map
+(defun tiled/tile-index (tiled-map x y)
+  (let ((tile-width (tiled-map-tile-width tiled-map)))
+    (+ x (* y tile-width))))
 
 ;; translate coordinate to map tile position
 (defun tiled/coord-to-tile-position (tiled-map x y)
@@ -232,4 +237,3 @@
     (loop for k being the hash-keys in texture-table using (hash-value v)
 	  do (let ((texture (tileset-data-texture v)))
 	       (sdl2:destroy-texture texture)))))
-

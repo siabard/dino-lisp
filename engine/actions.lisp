@@ -2,5 +2,5 @@
 
 ;; teleport
 (defun action/teleport (map col row)
-  (lambda (trigger entity)
+  (lambda (entity)
     (entity/teleport entity map col row)))
