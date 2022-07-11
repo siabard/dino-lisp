@@ -3,3 +3,15 @@
 (in-package #:dino-lisp)
 
 (defparameter *application-root* (uiop:getcwd))
+
+(defparameter *renderer* nil)
+(defparameter *textures* (make-hash-table :test #'equal))
+(defparameter *tiled-maps* (make-hash-table :test #'equal))
+(defparameter *entities* (make-hash-table :test #'equal))
+
+
+(defun init-global ()
+  (setf *renderer* nil)
+  (clrhash *textures*)
+  (clrhash *tiled-maps*)
+  (clrhash *entities*))
