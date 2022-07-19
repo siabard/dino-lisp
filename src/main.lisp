@@ -13,6 +13,7 @@
 	  (let* ((current-time (sdl2:get-ticks))
 		 (texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root* )))
 		 (tiled-map (create-tiled-map renderer (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*)))
+		 (trigger-table (make-hash-table :test #'equal))
 		 (hero (make-entity :texture texture
 				    :width 16
 				    :height 16
@@ -34,8 +35,9 @@
 	    (setf (gethash "hero" *entities*) hero)
 	    (setf (gethash "mainmap" *tiled-maps*) tiled-map)
 	    (setf (gethash "char" *textures*) texture)
-	    (trigger/add-to-tiled-map tiled-map 10 7 up-door-teleport)
-	    (trigger/add-to-tiled-map tiled-map 8 0 down-door-teleport)
+	    (setf *trigger-table* trigger-table)
+	    (trigger/add-enter-action trigger-table 10 7 up-door-teleport)
+	    (trigger/add-enter-action trigger-table 8 0 down-door-teleport)
 	    (init-keys keys)
 	    (entity/make-entity-atlas hero)
 	    (entity/make-animation-map hero)
@@ -67,7 +69,7 @@
 		       (entity/pre-update-dt hero)
 		       (entity/collide-with-tiled-map hero tiled-map)
 		       (entity/update-dt hero dt)
-		       (let ((action (trigger/get-from-tiled-map-with-entity tiled-map hero)))
+		       (let ((action (trigger/get-enter-action-with-map-and-entity trigger-table tiled-map hero)))
 			 (when action (apply action (list hero))))
 		       (multiple-value-bind (cam-x cam-y)
 			   (tiled/clip-xy tiled-map (entity-x hero) (entity-y hero) camera-width camera-height)

@@ -8,10 +8,11 @@
 (defparameter *textures* (make-hash-table :test #'equal))
 (defparameter *tiled-maps* (make-hash-table :test #'equal))
 (defparameter *entities* (make-hash-table :test #'equal))
-
+(defparameter *trigger-table* (make-hash-table :test #'equal))
 
 (defun init-global ()
   (setf *renderer* nil)
   (clrhash *textures*)
   (clrhash *tiled-maps*)
-  (clrhash *entities*))
+  (clrhash *entities*)
+  (clrhash *trigger-table*))
