@@ -13,6 +13,7 @@
 	  (let* ((current-time (sdl2:get-ticks))
 		 (texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root* )))
 		 (tiled-map (create-tiled-map renderer (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*)))
+		 (panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
 		 (trigger-table (make-hash-table :test #'equal))
 		 (hero (make-entity :texture texture
 				    :width 16
@@ -28,6 +29,7 @@
 				    :animation-span 30
 				    :current-animation ""
 				    :current-frame 0))
+		 (blue-panel (panel/setup panel-texture 3 3))
 		 (up-door-teleport (action/teleport tiled-map 1 1))
 		 (down-door-teleport (action/teleport tiled-map 10 8))
 		 (keys (make-instance 'key-input))
@@ -35,6 +37,7 @@
 	    (setf (gethash "hero" *entities*) hero)
 	    (setf (gethash "mainmap" *tiled-maps*) tiled-map)
 	    (setf (gethash "char" *textures*) texture)
+	    (setf (gethash "pannel" *textures*) panel-texture)
 	    (setf *trigger-table* trigger-table)
 	    (trigger/add-enter-action trigger-table 10 7 up-door-teleport)
 	    (trigger/add-enter-action trigger-table 8 0 down-door-teleport)
@@ -76,6 +79,7 @@
 			 (tiled/goto tiled-map cam-x cam-y)
 			 (tiled/render renderer tiled-map (sdl2:make-rect 0 0 camera-width camera-height))
 			 (entity/render hero renderer cam-x cam-y))
+		       (panel/render blue-panel renderer 50 50 120 120)
 		       (sdl2:render-present renderer)
 		       (clear-keys keys)
 		       (setf current-time (sdl2:get-ticks))

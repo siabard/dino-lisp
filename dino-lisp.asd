@@ -22,6 +22,7 @@
 			     (:file "key")
 			     (:file "actions")
 			     (:file "triggers")
-			     (:file "mouse")))
+			     (:file "mouse")
+			     (:file "gui")))
 	       (:module "src"
 		:components ((:file "main")))))
