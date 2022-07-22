@@ -17,7 +17,7 @@
 		 :tween (make-tween
 			 :start 0
 			 :end 1
-			 :timespan 150
+			 :timespan 50
 			 :current-time 0
 			 :running t)))
 	 (atlas (make-tile-atlas texture width height)))
