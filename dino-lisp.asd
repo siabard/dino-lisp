@@ -15,6 +15,7 @@
 			     (:file "global")
 			     (:file "tiled")
 			     (:file "util")
+			     (:file "tween")
 			     (:file "map_tile")
 			     (:file "tile_atlas")
 			     (:file "texture")

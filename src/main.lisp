@@ -22,8 +22,8 @@
 				    :y 0
 				    :new-x 0
 				    :new-y 0
-				    :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0)
-				    :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0)
+				    :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
+				    :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
 				    :maxspeed 40
 				    :elapsed-time 0
 				    :animation-span 30
@@ -72,6 +72,7 @@
 		       (entity/pre-update-dt hero)
 		       (entity/collide-with-tiled-map hero tiled-map)
 		       (entity/update-dt hero dt)
+		       (panel/update blue-panel dt)
 		       (let ((action (trigger/get-enter-action-with-map-and-entity trigger-table tiled-map hero)))
 			 (when action (apply action (list hero))))
 		       (multiple-value-bind (cam-x cam-y)

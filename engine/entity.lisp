@@ -4,51 +4,13 @@
 ;;;; TODO 초당 움직여야하는 수치(초당 60픽셀)를 이용해서
 ;;;; 단위 dt 당 변이값을 갖도록 한다.
 
-(defstruct tween start end timespan current-time)
-
-;; t : 0~1
-(defun tween/linear (tw)
-  (let* ((start (tween-start tw))
-	 (end   (tween-end tw))
-	 (ct    (tween-current-time tw))
-	 (ts    (tween-timespan tw))
-	 (ratio (cond ((= 0 ts) 0)
-		      (t  (/ ct ts))))
-	 (dt    (cond ((>= ratio 1) 1)
-		      (t ratio))))
-    (floor (+ (* (- 1  dt) start)
-	      (* dt end)))))
-
-
-;; tween 종료?
-(defun tween/end-p (tw)
-  (let ((current-time (tween-current-time tw))
-	(timespan (tween-timespan tw)))
-    (>=  current-time timespan)))
-
-
-;; tween 종료
-(defun tween/stop (tw)
-  (setf (tween-start tw)        0)
-  (setf (tween-end tw)          0)
-  (setf (tween-timespan tw)     0)
-  (setf (tween-current-time tw) 0))
-
-;; time 증가
-;; 종료확인하여 종료되면 tween 멈춤
-(defun tween/update-dt (tw dt)
-  (incf (tween-current-time tw) dt)
-  (when (tween/end-p tw)
-    (tween/stop tw)))
-
-
 (defstruct entity
   texture width height atlas x y
   new-x new-y
   dx dy
   maxspeed
   friction
-  elapsed-time
+  elapsed-tiem
   animation-span
   current-animation
   current-frame
@@ -153,18 +115,22 @@
 	 (dx        (entity-dx entity))
 	 (dy        (entity-dy entity)))
     (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-left))
+      (setf (tween-running dx) t)
       (decf (tween-start dx)        0.1)
       (setf (tween-timespan dx)     100)
       (setf (tween-current-time dx) 0))
     (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-right))
+      (setf (tween-running dx) t)
       (incf (tween-start dx)        0.1)
       (setf (tween-timespan dx)     100)
       (setf (tween-current-time dx) 0))
     (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-up))
+      (setf (tween-running dy) t)
       (decf (tween-start dy)        0.1)
       (setf (tween-timespan dy)     100)
       (setf (tween-current-time dy) 0))
     (when (key-held-p keys (sdl2:scancode-key-to-value :scancode-down))
+      (setf (tween-running dy) t)
       (incf (tween-start dy)        0.1)
       (setf (tween-timespan dy)     100)
       (setf (tween-current-time dy) 0))
