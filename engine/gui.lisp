@@ -74,3 +74,28 @@
       (panel/draw-partial renderer panel-texture panel-bot-left (sdl2:make-rect x (+  y panel-height panel-height-span) panel-width panel-height))
       (panel/draw-partial renderer panel-texture panel-bot-mid  (sdl2:make-rect (+  x panel-width)  (+  y panel-height panel-height-span) panel-width-span panel-height))
       (panel/draw-partial renderer panel-texture panel-bot-right (sdl2:make-rect (+  x panel-width panel-width-span) (+ y panel-height panel-height-span) panel-width panel-height)))))
+
+;; textbox
+;; textbox 는 Panel + Text의 조합이다.
+;; Text는 Panel 과 일정한 크기의 여백을 가진다.
+
+(defstruct textbox text font textscale textpanel textbounds texttexture)
+
+(defun textbox/set-text (textbox renderer text)
+  (let* ((font (textbox-font textbox))
+	 (texture-surface (sdl2-ttf:render-utf8-blended font text 255 255 255 0))
+	 (texture (sdl2:create-texture-from-surface renderer texture-surface)))
+    (sdl2:free-surface texture-surface)
+    (setf (textbox-texttexture textbox) texture)))
+
+(defun textbox/render (textbox renderer x y w h)
+  (let* ((panel (textbox-textpanel textbox)))
+    (panel/render panel renderer x y w h)
+    (multiple-value-bind (x y w h) (panel/tween-xywh panel x y w h)
+      (let* ((texture (textbox-texttexture textbox))
+	     (texture-width (sdl2:texture-width texture))
+	     (texture-height (sdl2:texture-height texture)))
+	(sdl2:render-copy-ex renderer
+			     texture
+			     :source-rect (sdl2:make-rect 0 0 texture-width texture-height)
+			     :dest-rect (sdl2:make-rect x y w h))))))
