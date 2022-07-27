@@ -1,9 +1,9 @@
 (in-package #:dino-lisp)
 
 (defun test/run-test (renderer font)
-  (text/render-char renderer font *glyphs* "한산도" 10 10)
-  (text/render-char renderer font *glyphs* "한산도" 10 80)
-  (text/render-char renderer font *glyphs* "한겨레" 10 100))
+  (text/render-char renderer font *glyphs* "한산도" 10 10 100 100)
+  (text/render-char renderer font *glyphs* "한산도" 10 80 50 100)
+  (text/render-char renderer font *glyphs* "한겨레" 10 100 20 100))
 
 (defun test/render-text ()
   (sdl2:with-init (:everything)
