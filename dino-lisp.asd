@@ -24,6 +24,8 @@
 			     (:file "actions")
 			     (:file "triggers")
 			     (:file "mouse")
-			     (:file "gui")))
+			     (:file "gui")
+			     (:file "text")))
 	       (:module "src"
-		:components ((:file "main")))))
+		:components ((:file "test")
+			     (:file "main")))))

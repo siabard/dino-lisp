@@ -83,7 +83,7 @@
 
 (defun textbox/set-text (textbox renderer text)
   (let* ((font (textbox-font textbox))
-	 (texture-surface (sdl2-ttf:render-utf8-blended font text 255 255 255 0))
+	 (texture-surface (sdl2-ttf:render-utf8-solid font text 255 255 255 0))
 	 (texture (sdl2:create-texture-from-surface renderer texture-surface)))
     (sdl2:free-surface texture-surface)
     (setf (textbox-texttexture textbox) texture)))

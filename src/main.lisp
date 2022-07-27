@@ -41,6 +41,7 @@
 	    (setf (gethash "mainmap" *tiled-maps*) tiled-map)
 	    (setf (gethash "char" *textures*) texture)
 	    (setf (gethash "pannel" *textures*) panel-texture)
+	    (setf (gethash "font10" *fonts*) font-10)
 	    (setf *trigger-table* trigger-table)
 	    (trigger/add-enter-action trigger-table 10 7 up-door-teleport)
 	    (trigger/add-enter-action trigger-table 8 0 down-door-teleport)

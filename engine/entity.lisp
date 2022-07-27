@@ -10,7 +10,7 @@
   dx dy
   maxspeed
   friction
-  elapsed-tiem
+  elapsed-time
   animation-span
   current-animation
   current-frame
