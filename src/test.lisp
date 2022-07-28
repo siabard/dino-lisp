@@ -17,4 +17,9 @@
 		   (sdl2:render-clear renderer)
 		   (test/run-test renderer font-10)
 		   (sdl2:render-present renderer))
-	    (:quit () t)))))))
+	    (:quit ()
+		   (progn
+		     (text/destroy-font font-10)
+		     (delete-global)
+		     (sdl2-ttf:quit))
+		   t)))))))

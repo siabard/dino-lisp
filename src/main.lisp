@@ -92,10 +92,8 @@
 		       (setf current-time (sdl2:get-ticks))
 		       (sdl2:delay 8)))
 	      (:quit ()
-		     (progn
-		       (entity/destroy-texture hero)
-		       (tiled/destroy-texture tiled-map)
-		       t)))))))))
+		     (delete-global)
+		     t))))))))
 
 (defun test-sdl2 ()
   (format t "START~%")
@@ -112,3 +110,13 @@
       (sdl2:with-renderer (renderer win)
 	(let ((tiled-map (create-tiled-map renderer (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*))))
 	  tiled-map)))))
+
+
+(defun texture-test ()
+  (sdl2:with-init (:video)
+    (sdl2:with-window (win :title "test")
+      (sdl2:with-renderer (renderer win)
+	(let ((texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root*))))
+	  (format t "Before Delete : ~A (null? : ~A)~%" texture (autowrap:valid-p texture))
+	  (sdl2:destroy-texture texture)
+	  (format t "After Delete ~A (null? : ~A)~%" texture (autowrap:valid-p texture)))))))

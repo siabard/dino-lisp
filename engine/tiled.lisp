@@ -236,4 +236,4 @@
   (let ((texture-table (tiled-map-atlas-texture-table tiled-map)))
     (loop for k being the hash-keys in texture-table using (hash-value v)
 	  do (let ((texture (tileset-data-texture v)))
-	       (sdl2:destroy-texture texture)))))
+	       (safe-delete-texture texture)))))

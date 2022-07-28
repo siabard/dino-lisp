@@ -154,7 +154,7 @@
 			 :dest-rect dest-rect)))
 
 (defun entity/destroy-texture (entity)
-  (sdl2:destroy-texture (entity-texture entity)))
+  (safe-delete-texture (entity-texture entity)))
 
 
 ;; map collision 영역과 부딪혔을 때 움직이지못하도록 처리

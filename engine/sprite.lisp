@@ -19,4 +19,4 @@
 		       :dest-rect (sprite-dest-rect sprite)))
 
 (defun sprite/destroy-texture (sprite)
-  (sdl2:destroy-texture (sprite-texture sprite)))
+  (safe-delete-texture (sprite-texture sprite)))
