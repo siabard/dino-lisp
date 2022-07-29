@@ -1,9 +1,9 @@
 (in-package #:dino-lisp)
 
 (defun test/run-test (renderer font)
-  (text/render-char renderer font *glyphs* "한산도" 10 10 100 100)
-  (text/render-char renderer font *glyphs* "한산도" 10 80 50 100)
-  (text/render-char renderer font *glyphs* "한겨레" 10 100 20 100))
+  (text/render-text renderer font *glyphs* "한산도 달 밝은 밤에 배에 수루에 홀로 앉아 어디서 일성호가는 남의 애를 끊나니" 10 10 100 100)
+  (text/render-text renderer font *glyphs* "한산도" 10 80 50 100)
+  (text/render-text renderer font *glyphs* "한겨레" 10 100 20 100))
 
 (defun test/render-text ()
   (sdl2:with-init (:everything)
@@ -18,8 +18,7 @@
 		   (test/run-test renderer font-10)
 		   (sdl2:render-present renderer))
 	    (:quit ()
-		   (progn
-		     (text/destroy-font font-10)
-		     (delete-global)
-		     (sdl2-ttf:quit))
+		   (text/destroy-font font-10)
+		   (delete-global)
+		   (sdl2-ttf:quit)
 		   t)))))))

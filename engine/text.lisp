@@ -3,8 +3,9 @@
 ;;;; porting from https://github.com/Samuel85/SDL_DrawText.git
 ;;;; original code is c++
 
-(defun text/render-char (renderer font glyphs char x y width height)
+(defun text/render-text (renderer font glyphs char x y width height)
   (let ((target-x x)
+	(target-y y)
 	(text-boundary-right  (+ x width))
 	(text-boundary-bottom (+ y height)))
     (loop for idx from 0 to (- (length char) 1)
@@ -23,12 +24,17 @@
 		    (w (if (>= text-boundary-right (+ target-x glyph-width))
 			   glyph-width
 			   (- text-boundary-right target-x)))
-		    (h glyph-height))
-	       (when (> w 0)
-		 (sdl2:render-copy-ex renderer
+		    (h (if (>= text-boundary-bottom (+ target-y glyph-height))
+			   glyph-height
+			   (- text-boundary-bottom target-y))))
+	       (when (> h 0)
+		 (when (<= w 0)
+	      	   (setf target-x x)
+		   (incf target-y glyph-height))
+	         (sdl2:render-copy-ex renderer
 				      glyph
-				      :source-rect (sdl2:make-rect 0 0 w h)
-				      :dest-rect (sdl2:make-rect target-x y w h)))
+				      :source-rect (sdl2:make-rect 0 0 glyph-width glyph-height)
+				      :dest-rect (sdl2:make-rect target-x target-y glyph-width glyph-height)))
 	       (incf target-x glyph-width)))))
 
 
