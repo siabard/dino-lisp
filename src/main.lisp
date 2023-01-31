@@ -120,3 +120,48 @@
 	  (format t "Before Delete : ~A (null? : ~A)~%" texture (autowrap:valid-p texture))
 	  (sdl2:destroy-texture texture)
 	  (format t "After Delete ~A (null? : ~A)~%" texture (autowrap:valid-p texture)))))))
+
+
+(defun software-render-test()
+  (sdl2:with-init (:video)
+    (sdl2:with-window (win :title "software rendering" :w 800 :h 600)
+      (sdl2:with-renderer (renderer win)
+	(sdl2:set-render-draw-blend-mode renderer sdl2-ffi:+sdl-blendmode-blend+)
+	(let ((texture (sdl2:create-texture renderer sdl2:+pixelformat-rgba8888+ sdl2-ffi:+sdl-textureaccess-target+ 320 240)))
+	  (sdl2:set-texture-blend-mode texture sdl2-ffi:+sdl-blendmode-blend+)
+	  (cffi:with-foreign-pointer (pixels (* 320 240 4))
+	    (setf (cffi:mem-ref pixels :uint32 0) #xff000090)
+	    (setf (cffi:mem-ref pixels :uint32 4) #xff000090)
+	    (setf (cffi:mem-ref pixels :uint32 8) #xff000090)
+	    (setf (cffi:mem-ref pixels :uint32 12) #xff0000ff)
+	    (setf (cffi:mem-ref pixels :uint32 16) #xff0000ff)
+	    (setf (cffi:mem-ref pixels :uint32 20) #xff0000ff)
+	    (setf (cffi:mem-ref pixels :uint32 24) #xff0000ff)
+	    (sdl2:update-texture texture (sdl2:make-rect 0 0 320 240) pixels (* 320 4))
+	    (sdl2:with-event-loop (:method :poll)
+	      (:idle ()
+		     (sdl2:render-clear renderer)
+		     (sdl2:render-copy-ex renderer texture
+					  :source-rect (sdl2:make-rect 0 0 320 240)
+					  :dest-rect (sdl2:make-rect 0 0 800 600)
+					  :angle 0
+					  :center (sdl2:make-point 0 0)
+					  :flip nil)
+		     (sdl2:render-present renderer)
+		     (sdl2:delay 8))
+	      (:quit ()
+		     t))
+	    )
+	  (sdl2:destroy-texture texture))))))
+
+
+(cffi:defcfun memset :pointer
+  (ptr :pointer)
+  (val :int)
+  (size :int))
+
+
+
+;; (let ((vec (cffi:make-shareable-byte-vector 256)))
+;;   (cffi:with-pointer-to-vector-data (ptr vec)
+;;     (memset ptr 0 (length vec))))
