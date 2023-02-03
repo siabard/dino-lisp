@@ -81,7 +81,7 @@
 	     (panel-height      (panel-struct-atlas-height panel))
 	     (panel-width-span  (- w (* 2 panel-width)))
 	     (panel-height-span (- h (* 2 panel-height))))
-      (when (and (> panel-width 0) (> panel-height))
+      (when (and (> panel-width-span 0) (> panel-height-span))
 	(panel/draw-partial renderer panel-texture panel-top-left (sdl2:make-rect x y panel-width panel-height))
 	(panel/draw-partial renderer panel-texture panel-top-mid  (sdl2:make-rect (+  x panel-width) y panel-width-span panel-height))
 	(panel/draw-partial renderer panel-texture panel-top-right (sdl2:make-rect (+  x panel-width panel-width-span) y panel-width panel-height))

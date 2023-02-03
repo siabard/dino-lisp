@@ -39,5 +39,5 @@
 		   )
 	    )
 	  (sdl2:destroy-texture panel-texture)
-	)
-      )))
+	  )
+	))))
