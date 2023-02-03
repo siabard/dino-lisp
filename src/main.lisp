@@ -8,6 +8,7 @@
     (sdl2:with-init (:video)
       (sdl2:with-window (win :title "Dinodeck" :flags '(:shown) :w 800 :h 600)
 	(sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	  (sdl2:set-render-draw-blend-mode renderer sdl2-ffi:+sdl-blendmode-blend+)
 	  (setf *renderer* renderer)
 	  (sdl2-image:init '(:jpg :png))
 	  (sdl2-ttf:init)
@@ -150,9 +151,9 @@
 		     (sdl2:render-present renderer)
 		     (sdl2:delay 8))
 	      (:quit ()
+		     (sdl2:destroy-texture texture)
 		     t))
-	    )
-	  (sdl2:destroy-texture texture))))))
+	    ))))))
 
 
 (cffi:defcfun memset :pointer

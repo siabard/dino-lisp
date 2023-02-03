@@ -31,6 +31,21 @@
 			     :dest-rect dest-rect)))
     (sprite/render sprite renderer)))
 
+(defun panel/draw-partial-gradient (renderer source-rect dest-rect start-color end-color)
+  (let ((texture (create-gradient-texture renderer
+					  (sdl2:rect-width dest-rect)
+					  (sdl2:rect-height dest-rect)
+					  start-color
+					  end-color)))
+    (sdl2:render-copy-ex renderer
+			 texture
+			 :source-rect source-rect
+			 :dest-rect dest-rect
+			 :angle 0
+			 :center (sdl2:make-point 0 0)
+			 :flip nil)
+    (sdl2:destroy-texture texture)))
+
 (defun panel/update (panel dt)
   (let ((tween (panel-struct-tween panel)))
     (when tween (tween/update-dt tween dt))))
@@ -50,30 +65,41 @@
 
 (defun panel/render (panel renderer x y w h)
   (multiple-value-bind (x y w h) (panel/tween-xywh panel x y w h)
+
     (let* ((panel-texture     (panel-struct-texture panel))
-	   (panel-atlas       (panel-struct-atlas panel))
-	   (panel-top-left    (nth 0 panel-atlas))
-	   (panel-top-mid     (nth 1 panel-atlas))
-	   (panel-top-right   (nth 2 panel-atlas))
-	   (panel-mid-left    (nth 3 panel-atlas))
-	   (panel-mid-mid     (nth 4 panel-atlas))
-	   (panel-mid-right   (nth 5 panel-atlas))
-	   (panel-bot-left    (nth 6 panel-atlas))
-	   (panel-bot-mid     (nth 7 panel-atlas))
-	   (panel-bot-right   (nth 8 panel-atlas))
-	   (panel-width       (panel-struct-atlas-width panel))
-	   (panel-height      (panel-struct-atlas-height panel))
-	   (panel-width-span  (- w (* 2 panel-width)))
-	   (panel-height-span (- h (* 2 panel-height))))
-      (panel/draw-partial renderer panel-texture panel-top-left (sdl2:make-rect x y panel-width panel-height))
-      (panel/draw-partial renderer panel-texture panel-top-mid  (sdl2:make-rect (+  x panel-width) y panel-width-span panel-height))
-      (panel/draw-partial renderer panel-texture panel-top-right (sdl2:make-rect (+  x panel-width panel-width-span) y panel-width panel-height))
-      (panel/draw-partial renderer panel-texture panel-mid-left (sdl2:make-rect x (+  y panel-height) panel-width  panel-height-span))
-      (panel/draw-partial renderer panel-texture panel-mid-mid  (sdl2:make-rect (+  x panel-width) (+  y panel-height) panel-width-span panel-height-span))
-      (panel/draw-partial renderer panel-texture panel-mid-right (sdl2:make-rect (+  x panel-width panel-width-span) (+ y panel-height) panel-width panel-height-span))
-      (panel/draw-partial renderer panel-texture panel-bot-left (sdl2:make-rect x (+  y panel-height panel-height-span) panel-width panel-height))
-      (panel/draw-partial renderer panel-texture panel-bot-mid  (sdl2:make-rect (+  x panel-width)  (+  y panel-height panel-height-span) panel-width-span panel-height))
-      (panel/draw-partial renderer panel-texture panel-bot-right (sdl2:make-rect (+  x panel-width panel-width-span) (+ y panel-height panel-height-span) panel-width panel-height)))))
+	     (panel-atlas       (panel-struct-atlas panel))
+	     (panel-top-left    (nth 0 panel-atlas))
+	     (panel-top-mid     (nth 1 panel-atlas))
+	     (panel-top-right   (nth 2 panel-atlas))
+	     (panel-mid-left    (nth 3 panel-atlas))
+	     (panel-mid-mid     (nth 4 panel-atlas))
+	     (panel-mid-right   (nth 5 panel-atlas))
+	     (panel-bot-left    (nth 6 panel-atlas))
+	     (panel-bot-mid     (nth 7 panel-atlas))
+	     (panel-bot-right   (nth 8 panel-atlas))
+	     (panel-width       (panel-struct-atlas-width panel))
+	     (panel-height      (panel-struct-atlas-height panel))
+	     (panel-width-span  (- w (* 2 panel-width)))
+	     (panel-height-span (- h (* 2 panel-height))))
+      (when (and (> panel-width 0) (> panel-height))
+	(panel/draw-partial renderer panel-texture panel-top-left (sdl2:make-rect x y panel-width panel-height))
+	(panel/draw-partial renderer panel-texture panel-top-mid  (sdl2:make-rect (+  x panel-width) y panel-width-span panel-height))
+	(panel/draw-partial renderer panel-texture panel-top-right (sdl2:make-rect (+  x panel-width panel-width-span) y panel-width panel-height))
+	(panel/draw-partial renderer panel-texture panel-mid-left (sdl2:make-rect x (+  y panel-height) panel-width  panel-height-span))
+	;;(panel/draw-partial renderer panel-texture panel-mid-mid  (sdl2:make-rect (+  x panel-width) (+  y panel-height) panel-width-span panel-height-span))
+	(panel/draw-partial-gradient renderer
+				     panel-mid-mid
+				     (sdl2:make-rect (+  x panel-width)
+						     (+  y panel-height)
+						     panel-width-span
+						     panel-height-span)
+				     #xff0000ff
+				     #x0000ffff)
+	(panel/draw-partial renderer panel-texture panel-mid-right (sdl2:make-rect (+  x panel-width panel-width-span) (+ y panel-height) panel-width panel-height-span))
+	(panel/draw-partial renderer panel-texture panel-bot-left (sdl2:make-rect x (+  y panel-height panel-height-span) panel-width panel-height))
+	(panel/draw-partial renderer panel-texture panel-bot-mid  (sdl2:make-rect (+  x panel-width)  (+  y panel-height panel-height-span) panel-width-span panel-height))
+	(panel/draw-partial renderer panel-texture panel-bot-right (sdl2:make-rect (+  x panel-width panel-width-span) (+ y panel-height panel-height-span) panel-width panel-height))))))
+
 
 ;; textbox
 ;; textbox 는 Panel + Text의 조합이다.

@@ -22,3 +22,22 @@
 		   (delete-global)
 		   (sdl2-ttf:quit)
 		   t)))))))
+
+(defun test/gradient-test ()
+  (sdl2:with-init (:video)
+    (sdl2:with-window (win :title "Gradient Box" :w 800 :h 600)
+      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	(sdl2-image:init '(:jpg :png))
+	(let* ((panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*))))
+
+	  (sdl2:with-event-loop (:method :poll)
+	    (:idle ()
+		   (sdl2:render-clear renderer)
+
+		   (sdl2:render-present renderer)
+		   (sdl2:delay 40)
+		   )
+	    )
+	  (sdl2:destroy-texture panel-texture)
+	)
+      )))
