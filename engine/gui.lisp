@@ -37,6 +37,7 @@
 					  (sdl2:rect-height dest-rect)
 					  start-color
 					  end-color)))
+    (sdl2:set-texture-blend-mode texture sdl2-ffi:+sdl-blendmode-blend+)
     (sdl2:render-copy-ex renderer
 			 texture
 			 :source-rect source-rect

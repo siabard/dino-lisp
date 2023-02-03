@@ -41,10 +41,3 @@
 				  c))))
 	(sdl2:update-texture texture (sdl2:make-rect 0 0 width height) pixels (* width 4))))
       texture))
-
-
-(loop for x from 1 to 3
-      do (progn
-	   (loop for y from 1 to 3
-		 do (format t "~A ~A ~%" x y))
-	   (format t "~%")))
