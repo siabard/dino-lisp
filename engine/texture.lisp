@@ -37,7 +37,7 @@
 				       (ash g 16)
 				       (ash b 8)
 				       a)))
-			    (setf (cffi:mem-ref pixels :uint32 (+ (* x 4) (* y width)))
+			    (setf (cffi:mem-ref pixels :uint32 (+ (* x 4) (* y width 4)))
 				  c))))
 	(sdl2:update-texture texture (sdl2:make-rect 0 0 width height) pixels (* width 4))))
       texture))

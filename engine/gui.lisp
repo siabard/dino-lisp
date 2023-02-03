@@ -31,7 +31,7 @@
 			     :dest-rect dest-rect)))
     (sprite/render sprite renderer)))
 
-(defun panel/draw-partial-gradient (renderer source-rect dest-rect start-color end-color)
+(defun panel/draw-partial-gradient (renderer dest-rect start-color end-color)
   (let ((texture (create-gradient-texture renderer
 					  (sdl2:rect-width dest-rect)
 					  (sdl2:rect-height dest-rect)
@@ -40,7 +40,7 @@
     (sdl2:set-texture-blend-mode texture sdl2-ffi:+sdl-blendmode-blend+)
     (sdl2:render-copy-ex renderer
 			 texture
-			 :source-rect source-rect
+			 :source-rect (sdl2:make-rect 0 0 (sdl2:rect-width dest-rect) (sdl2:rect-height dest-rect))
 			 :dest-rect dest-rect
 			 :angle 0
 			 :center (sdl2:make-point 0 0)
@@ -89,7 +89,6 @@
 	(panel/draw-partial renderer panel-texture panel-mid-left (sdl2:make-rect x (+  y panel-height) panel-width  panel-height-span))
 	;;(panel/draw-partial renderer panel-texture panel-mid-mid  (sdl2:make-rect (+  x panel-width) (+  y panel-height) panel-width-span panel-height-span))
 	(panel/draw-partial-gradient renderer
-				     panel-mid-mid
 				     (sdl2:make-rect (+  x panel-width)
 						     (+  y panel-height)
 						     panel-width-span
