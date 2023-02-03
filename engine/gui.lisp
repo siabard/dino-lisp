@@ -93,7 +93,7 @@
 						     (+  y panel-height)
 						     panel-width-span
 						     panel-height-span)
-				     #xff0000ff
+				     #xffff00ff
 				     #x0000ffff)
 	(panel/draw-partial renderer panel-texture panel-mid-right (sdl2:make-rect (+  x panel-width panel-width-span) (+ y panel-height) panel-width panel-height-span))
 	(panel/draw-partial renderer panel-texture panel-bot-left (sdl2:make-rect x (+  y panel-height panel-height-span) panel-width panel-height))

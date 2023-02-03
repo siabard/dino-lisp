@@ -24,7 +24,7 @@
 	     (e-a (logand end-color #x000000ff)))
 	(loop for y from 0 to (- height 1)
 	      do (loop for x from 0 to (- width 1)
-		       do (let* ((ratio (/ (* (+ x y) 1.0) 510))
+		       do (let* ((ratio (/ (* (+ x y) 1.0) (+ width height)))
 				 (r (floor (+ (* s-r (- 1 ratio))
 					      (* e-r ratio))))
 				 (g (floor (+ (* s-g (- 1 ratio))
