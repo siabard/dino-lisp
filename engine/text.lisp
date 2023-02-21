@@ -15,7 +15,6 @@
 			       (let* ((surface (sdl2-ttf:render-utf8-solid font ch 255 255 255 0))
 				      (texture (sdl2:create-texture-from-surface renderer surface)))
 
-				 ;;(sdl2:free-surface surface)
 				 (setf (gethash ch glyphs) texture)
 				 texture)
 			       org-glyph))

@@ -11,6 +11,8 @@
 (defparameter *entities* (make-hash-table :test #'equal))
 (defparameter *trigger-table* (make-hash-table :test #'equal))
 (defparameter *fonts* (make-hash-table :test #'equal))
+(defparameter *loaded-images* (make-hash-table :test #'equal))
+(defparameter *map* (make-hash-table :test #'equal))
 
 (defun init-global ()
   (setf *renderer* nil)
@@ -19,8 +21,9 @@
   (clrhash *entities*)
   (clrhash *trigger-table*)
   (clrhash *glyphs*)
-  (clrhash *fonts*))
-
+  (clrhash *fonts*)
+  (clrhash *loaded-images*)
+  (clrhash *map*))
 
 (defun delete-global-texture ()
   (loop for k being the hash-keys in *textures* using (hash-value v)

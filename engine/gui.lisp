@@ -124,3 +124,46 @@
 			     texture
 			     :source-rect (sdl2:make-rect 0 0 texture-width texture-height)
 			     :dest-rect (sdl2:make-rect x y w h))))))
+
+;; dialog window
+(defclass dialog-window () ((x :initarg :x
+			       :accessor x)
+			    (y :initarg :y
+			       :accessor y)
+			    (w :initarg :w
+			       :accessor w)
+			    (h :initarg :h
+			       :accessor h)
+			    (texts :initarg :texts
+				   :accessor texts)))
+
+;;;; 생성자
+(defun make-dialog-window (x y texts)
+  (let ((full-length (apply #'max 0 (mapcar #'length texts))))
+    (make-instance 'dialog-window
+		   :x x
+		   :y y
+		   :w (+ 16 (* full-length 16))
+		   :h (+ 16 (* (length texts) 16))
+		   :texts texts)))
+
+
+;;;; rendering 하기
+(defgeneric render-dialog-window (dialog-window &key renderer)
+  (:documentation "render dialog window"))
+
+(defmethod render-dialog-window (dialog-window &key renderer)
+  (let* ((x (x dialog-window))
+	 (y (y dialog-window))
+	 (w (w dialog-window))
+	 (h (h dialog-window))
+	 (texts (texts dialog-window)))
+    ;; 외곽선 긋기
+    (sdl2:set-render-draw-color renderer 0 0 0 255)
+    (sdl2:render-fill-rect renderer (sdl2:make-rect x y w h))
+    (sdl2:set-render-draw-color renderer 255 255 255 255)
+    (sdl2:render-draw-rect renderer (sdl2:make-rect (+ x 4) (+ y 4) (- w 4) (- h 4)))
+    ;; 내용 쓰기
+    (dolist (text texts)
+      (draw-string renderer (+ x 8) (+ y 8) text)
+      (incf y 16))))
