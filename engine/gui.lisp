@@ -162,7 +162,7 @@
     (sdl2:set-render-draw-color renderer 0 0 0 255)
     (sdl2:render-fill-rect renderer (sdl2:make-rect x y w h))
     (sdl2:set-render-draw-color renderer 255 255 255 255)
-    (sdl2:render-draw-rect renderer (sdl2:make-rect (+ x 4) (+ y 4) (- w 4) (- h 4)))
+    (sdl2:render-draw-rect renderer (sdl2:make-rect (+ x 4) (+ y 4) (- w 8) (- h 8)))
     ;; 내용 쓰기
     (dolist (text texts)
       (draw-string renderer (+ x 8) (+ y 8) text)
