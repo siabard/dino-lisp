@@ -37,9 +37,27 @@
 
 (defclass item ()
   ((uuid :initarg :uuid
-	 :accessor uuid)))
+	 :accessor uuid)
+   (category :initarg :category
+	     :accessor category)
+   (name :initarg :name
+	 :accessor name)))
 
 
+(defun make-item (category name)
+  (make-instance 'item
+		 :uuid (uuid:make-v4-uuid)
+		 :category category
+		 :name name))
+
+(defgeneric print-item (item)
+  (:documentation "print item infomation"))
+
+(defmethod print-item (item)
+  (format t "~A ~A ~%" (name item) (category item)))
+
+;;; 보정값을 구하기위해 일련의 아이템 정보를 받아 인벤토리 아이템으로
+;;; 얻어지는 이득치를 계산한다.
 (defun sum-of-hash-table (hashtables)
   (let ((result (make-hash-table :test #'equal)))
     (dolist (item hashtables)
