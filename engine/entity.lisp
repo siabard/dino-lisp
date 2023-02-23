@@ -14,7 +14,8 @@
   animation-span
   current-animation
   current-frame
-  animation-map)
+  animation-map
+  inventory)
 
 
 (defun entity/make-entity-atlas (entity)
