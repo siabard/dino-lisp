@@ -54,7 +54,7 @@
   (:documentation "print item infomation"))
 
 (defmethod print-item (item)
-  (format t "~A ~A ~%" (name item) (category item)))
+  (format t "~A ~A ~A ~%" (uuid item) (name item) (category item)))
 
 ;;; 보정값을 구하기위해 일련의 아이템 정보를 받아 인벤토리 아이템으로
 ;;; 얻어지는 이득치를 계산한다.
@@ -68,3 +68,15 @@
 			       (t value)))))
 	       item))
     result))
+
+(defun show-item-db (db)
+  (maphash (lambda (key value)
+	     (print-item value))
+	   db))
+
+(defun create-item (category name)
+  (let ((item (make-item category name)))
+    (setf (gethash (uuid:format-as-urn nil (uuid item)) *item-db*) item)))
+
+(defun destroy-item (item-uuid)
+  (remhash (uuid:format-as-urn nil item-uuid) *item-db*))

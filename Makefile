@@ -21,4 +21,4 @@ build:
 		--eval '(ql:quickload "deploy")' \
 		--load $(PROJECT).asd \
 		--eval '(ql:quickload "$(PROJECT)")' \
-		--eval '(asdf:make :$(PROJECT))'
+		--eval '(asdf:make :dino-lisp)'

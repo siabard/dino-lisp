@@ -200,3 +200,15 @@
   (let ((coord (tiled/tile-position-to-coord tiled-map col row)))
     (setf (entity-x entity) (car coord))
     (setf (entity-y entity) (cadr coord))))
+
+;; 아이템을 갖는다.
+;; 실제 item의 정보는 *item-db* 에 있을 것이고
+;; inventory에서는 uuid 값만 넣는다.
+(defun entity/get-item (entity item-uuid)
+  (push (entity-inventory entity) item-uuid))
+
+;; 아이템을 잃는다.
+(defun entity/lost-item (entity item-uuid)
+  (setf (entity-inventory entity)
+	(remove-if (lambda (item) (= item item-uuid))
+		   (entity-inventory entity))))

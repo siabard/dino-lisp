@@ -7,6 +7,10 @@
   :version "0.0.1"
   :depends-on ("swank" "sdl2" "sdl2-image" "sdl2-ttf" "cl-tiled" "imago" "uuid")
   :serial t
+  :defsystem-depends-on (:deploy)
+  :build-operation "deploy-op"
+  :build-pathname "dino-lisp"
+  :entry-point "dino-lisp::game_main"
   :components ((:file "package")
                (:file "dino-lisp")	       
 	       (:module "engine"
