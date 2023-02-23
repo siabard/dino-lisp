@@ -32,4 +32,6 @@
 		:components ((:file "test")
 			     (:file "main")))
 	       (:module "util"
-		:components ((:file "swank")))))
+		:components ((:file "swank")))
+	       (:module "system"
+		:components ((:file "inventory")))))
