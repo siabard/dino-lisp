@@ -33,28 +33,36 @@
 ;; (push *armor* *test-attr*)
 ;; (push *shild* *test-attr*)
 
-
-
+;;; 아이템은 entity에 대해 n의 관계이므로
+;;; 아이템에는 map이나 entity에 대한 위치 데이터도 필요하다.
+;;; owner 에 값이 있다면 대상 entity이며, 없다면 map의 특정 위치에 있는 것이다.
+;;; 그러므로 position 과 owner 정보가 복합적으로 필요하다.
 (defclass item ()
   ((uuid :initarg :uuid
 	 :accessor uuid)
    (category :initarg :category
 	     :accessor category)
    (name :initarg :name
-	 :accessor name)))
+	 :accessor name)
+   (owner :initarg :owner
+	  :accessor owner)
+   (map-position :initarg :map-position
+		 :accessor map-position)))
 
 
-(defun make-item (category name)
+(defun make-item (name &key category owner map-position)
   (make-instance 'item
 		 :uuid (uuid:make-v4-uuid)
 		 :category category
-		 :name name))
+		 :name name
+		 :owner owner
+		 :map-position map-position))
 
 (defgeneric print-item (item)
   (:documentation "print item infomation"))
 
 (defmethod print-item (item)
-  (format t "~A ~A ~A ~%" (uuid item) (name item) (category item)))
+  (format t "~A ~A ~A ~A ~%" (uuid item) (name item) (category item) (owner item)))
 
 ;;; 보정값을 구하기위해 일련의 아이템 정보를 받아 인벤토리 아이템으로
 ;;; 얻어지는 이득치를 계산한다.
@@ -74,9 +82,9 @@
 	     (print-item value))
 	   db))
 
-(defun create-item (category name)
-  (let ((item (make-item category name)))
-    (setf (gethash (uuid:format-as-urn nil (uuid item)) *item-db*) item)))
+(defun create-item (db category name)
+  (let ((item (make-item name :category category)))
+    (setf (gethash (uuid:format-as-urn nil (uuid item)) db) item)))
 
-(defun destroy-item (item-uuid)
-  (remhash (uuid:format-as-urn nil item-uuid) *item-db*))
+(defun destroy-item (db item-uuid)
+  (remhash (uuid:format-as-urn nil item-uuid) db))

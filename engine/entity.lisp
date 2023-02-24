@@ -14,8 +14,7 @@
   animation-span
   current-animation
   current-frame
-  animation-map
-  inventory)
+  animation-map)
 
 
 (defun entity/make-entity-atlas (entity)
@@ -203,12 +202,17 @@
 
 ;; 아이템을 갖는다.
 ;; 실제 item의 정보는 *item-db* 에 있을 것이고
-;; inventory에서는 uuid 값만 넣는다.
-(defun entity/get-item (entity item-uuid)
-  (push (entity-inventory entity) item-uuid))
+;; 해당 item 정보의 owner에 entity를 넣는다.
+(defun entity/get-item (entity item-uuid db)
+  (let ((item (gethash (uuid:format-as-urn nil
+					   (uuid:make-uuid-from-string  item-uuid))
+		       db)))
+    (setf (owner item) entity)
+    (setf (map-position item) nil)))
 
 ;; 아이템을 잃는다.
-(defun entity/lost-item (entity item-uuid)
-  (setf (entity-inventory entity)
-	(remove-if (lambda (item) (= item item-uuid))
-		   (entity-inventory entity))))
+(defun entity/lost-item (entity item-uuid db)
+  (let ((item (gethash (uuid:format-as-urn nil
+					   (uuid:make-uuid-from-string  item-uuid))
+		       db)))
+    (setf (owner item) nil)))
