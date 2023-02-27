@@ -47,16 +47,22 @@
    (owner :initarg :owner
 	  :accessor owner)
    (map-position :initarg :map-position
-		 :accessor map-position)))
+		 :accessor map-position)
+   (texture :initarg :texture
+	    :accessor texture)
+   (atlas :initarg :atlas
+	  :accessor atlas)))
 
 
-(defun make-item (name &key category owner map-position)
+(defun make-item (name &key category owner map-position texture atlas)
   (make-instance 'item
 		 :uuid (uuid:make-v4-uuid)
 		 :category category
 		 :name name
 		 :owner owner
-		 :map-position map-position))
+		 :map-position map-position
+		 :texture texture
+		 :atlas atlas))
 
 (defgeneric print-item (item)
   (:documentation "print item infomation"))
@@ -88,3 +94,10 @@
 
 (defun destroy-item (db item-uuid)
   (remhash (uuid:format-as-urn nil item-uuid) db))
+
+
+;;; rendering 은 각 아이템별이 그릴 texture atlas 값을 토대로 한다.
+;;; item 과 entity 관계는 n:1 의 관계이다.
+;;; 그러므로 item 에 entity에 대한 key 값이 있어야한다.
+;;; 또한 map 에 등재될 수 있기 때문에, 우리는 item이 entity에 속한 것인지
+;;; map 에 속한 것인지를 확실히 정해야한다.

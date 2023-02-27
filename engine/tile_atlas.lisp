@@ -1,6 +1,10 @@
 (in-package #:dino-lisp)
 
 ;;;; Texture 정보를 토대로 Atlas 정보를 만듦
+;;;; texture 하나를 전체로 자르기 때문에
+;;;; atlas의 특정 셀만을 써서 넣는 것을 추천
+;;;; atlas는 source-rect 에 준하는 rect 형이므로
+;;;; 적절한 셀만 넣는다면 큰 문제는 아님
 
 (defun make-tile-atlas (texture tile-width tile-height)
   (let ((texture-height (sdl2:texture-height texture))
