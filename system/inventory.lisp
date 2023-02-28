@@ -88,12 +88,15 @@
 	     (print-item value))
 	   db))
 
-(defun create-item (db category name)
-  (let ((item (make-item name :category category)))
+(defun create-item (db &key category name texture atlas )
+  (let ((item (make-item name
+			 :category category
+			 :texture texture
+			 :atlas atlas)))
     (setf (gethash (uuid:format-as-urn nil (uuid item)) db) item)))
 
-(defun destroy-item (db item-uuid)
-  (remhash (uuid:format-as-urn nil item-uuid) db))
+(defun destroy-item (db &key uuid)
+  (remhash (uuid:format-as-urn nil uuid) db))
 
 
 ;;; rendering 은 각 아이템별이 그릴 texture atlas 값을 토대로 한다.
@@ -101,3 +104,14 @@
 ;;; 그러므로 item 에 entity에 대한 key 값이 있어야한다.
 ;;; 또한 map 에 등재될 수 있기 때문에, 우리는 item이 entity에 속한 것인지
 ;;; map 에 속한 것인지를 확실히 정해야한다.
+
+(defgeneric render-item (item renderer x y)
+  (:documentation "render item"))
+
+(defmethod render-item (item renderer x y)
+  (let ((texture (texture item))
+	(atlas (atlas item)))
+    (sdl2:render-copy-ex renderer
+			 texture
+			 :source-rect atlas
+			 :dest-rect (sdl2:make-rect x y 16 16))))
