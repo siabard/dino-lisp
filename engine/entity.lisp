@@ -4,6 +4,8 @@
 ;;;; TODO 초당 움직여야하는 수치(초당 60픽셀)를 이용해서
 ;;;; 단위 dt 당 변이값을 갖도록 한다.
 
+;;; TODO component 에 맞게끔 entity를 정리해야할 듯..
+
 (defstruct entity
   texture width height atlas x y
   new-x new-y

@@ -32,6 +32,8 @@
 			     (:file "camera")
 			     (:file "hangul")
 			     (:file "scene")
+			     (:file "ecs")
+			     (:file "component")
 			     (:file "bitmap_font")
 			     (:file "text")))
 	       (:module "src"
