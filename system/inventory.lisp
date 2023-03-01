@@ -38,8 +38,8 @@
 ;;; owner 에 값이 있다면 대상 entity이며, 없다면 map의 특정 위치에 있는 것이다.
 ;;; 그러므로 position 과 owner 정보가 복합적으로 필요하다.
 (defclass item ()
-  ((uuid :initarg :uuid
-	 :accessor uuid)
+  ((uid :initarg :uid
+	:accessor uid)
    (category :initarg :category
 	     :accessor category)
    (name :initarg :name
@@ -56,7 +56,7 @@
 
 (defun make-item (name &key category owner map-position texture atlas)
   (make-instance 'item
-		 :uuid (uuid:make-v4-uuid)
+		 :uid (generate-id "item_")
 		 :category category
 		 :name name
 		 :owner owner
@@ -93,10 +93,10 @@
 			 :category category
 			 :texture texture
 			 :atlas atlas)))
-    (setf (gethash (uuid:format-as-urn nil (uuid item)) db) item)))
+    (setf (gethash (uid item) db) item)))
 
-(defun destroy-item (db &key uuid)
-  (remhash (uuid:format-as-urn nil uuid) db))
+(defun destroy-item (db &key uid)
+  (remhash uid db))
 
 
 ;;; rendering 은 각 아이템별이 그릴 texture atlas 값을 토대로 한다.

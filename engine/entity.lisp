@@ -203,16 +203,12 @@
 ;; 아이템을 갖는다.
 ;; 실제 item의 정보는 *item-db* 에 있을 것이고
 ;; 해당 item 정보의 owner에 entity를 넣는다.
-(defun entity/get-item (entity item-uuid db)
-  (let ((item (gethash (uuid:format-as-urn nil
-					   (uuid:make-uuid-from-string  item-uuid))
-		       db)))
+(defun entity/get-item (entity uid db)
+  (let ((item (gethash uid db)))
     (setf (owner item) entity)
     (setf (map-position item) nil)))
 
 ;; 아이템을 잃는다.
-(defun entity/lost-item (entity item-uuid db)
-  (let ((item (gethash (uuid:format-as-urn nil
-					   (uuid:make-uuid-from-string  item-uuid))
-		       db)))
+(defun entity/lost-item (entity uid db)
+  (let ((item (gethash uid db)))
     (setf (owner item) nil)))

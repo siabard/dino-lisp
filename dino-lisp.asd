@@ -5,7 +5,7 @@
   :author "Yeonho Jang <siabard@gmail.com>"
   :license  "MIT"
   :version "0.0.1"
-  :depends-on ("swank" "sdl2" "sdl2-image" "sdl2-ttf" "cl-tiled" "imago" "uuid")
+  :depends-on ("swank" "sdl2" "sdl2-image" "sdl2-ttf" "cl-tiled" "imago")
   :serial t
   :defsystem-depends-on (:deploy)
   :build-operation "deploy-op"
@@ -29,13 +29,19 @@
 			     (:file "triggers")
 			     (:file "mouse")
 			     (:file "gui")
+			     (:file "camera")
 			     (:file "hangul")
+			     (:file "scene")
 			     (:file "bitmap_font")
 			     (:file "text")))
 	       (:module "src"
 		:components ((:file "test")
-			     (:file "main")))
+			     (:file "main")
+			     (:file "inventory_test")))
 	       (:module "util"
-		:components ((:file "swank")))
+		:components ((:file "swank")
+			     (:file "uid")))
 	       (:module "system"
-		:components ((:file "inventory")))))
+		:components ((:file "inventory")))
+	       (:module "states"
+		:components ((:file "state")))))

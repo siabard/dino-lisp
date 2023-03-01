@@ -33,4 +33,5 @@
 		   (sdl2:delay 8))
 	    (:quit ()
 		   (delete-global)
+		   (sdl2:destroy-texture item-texture)
 		   (clrhash *item-db*))))))))

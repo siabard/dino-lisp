@@ -125,17 +125,24 @@
 			     :source-rect (sdl2:make-rect 0 0 texture-width texture-height)
 			     :dest-rect (sdl2:make-rect x y w h))))))
 
+;; gui
+(defclass gui () ())
+
+(defgeneric render-gui (gui renderer)
+  (:documentation "rendering gui"))
+
+
 ;; dialog window
-(defclass dialog-window () ((x :initarg :x
-			       :accessor x)
-			    (y :initarg :y
-			       :accessor y)
-			    (w :initarg :w
-			       :accessor w)
-			    (h :initarg :h
-			       :accessor h)
-			    (texts :initarg :texts
-				   :accessor texts)))
+(defclass dialog-window (gui) ((x :initarg :x
+				  :accessor x)
+			       (y :initarg :y
+				  :accessor y)
+			       (w :initarg :w
+				  :accessor w)
+			       (h :initarg :h
+				  :accessor h)
+			       (texts :initarg :texts
+				      :accessor texts)))
 
 ;;;; 생성자
 (defun make-dialog-window (x y texts)
@@ -167,3 +174,6 @@
     (dolist (text texts)
       (draw-string renderer (+ x 8) (+ y 8) text)
       (incf y 16))))
+
+(defmethod render-gui ((gui dialog-window) renderer)
+  (render-dialog-window gui :renderer renderer))
