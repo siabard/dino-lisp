@@ -20,20 +20,23 @@
 		 (tiled-map (create-tiled-map renderer (uiop:merge-pathnames* "assets/tiled_base64_zlib.tmx" *application-root*)))
 		 (panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
 		 (trigger-table (make-hash-table :test #'equal))
-		 (hero (make-entity :texture texture
-				    :width 16
-				    :height 16
-				    :x 0
-				    :y 0
-				    :new-x 0
-				    :new-y 0
-				    :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
-				    :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
-				    :maxspeed 40
-				    :elapsed-time 0
-				    :animation-span 30
-				    :current-animation ""
-				    :current-frame 0))
+		 (hero (make-entity :controlable (make-controlable :flag T)
+				    :renderable (make-renderable  :texture texture
+								  :width 16
+								  :height 16
+								  )
+				    :movable (make-movable :x 0
+							   :y 0
+							   :new-x 0
+							   :new-y 0
+							   :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
+							   :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
+							   :maxspeed 40)
+				    :animatable (make-animatable
+						 :elapsed-time 0
+						 :animation-span 30
+						 :current-animation ""
+						 :current-frame 0)))
 		 (blue-panel (panel/setup panel-texture 3 3))
 		 (hello-textbox (make-textbox :font font-10 :textpanel blue-panel))
 		 (textbox (make-dialog-window 40 60 '("HELLO" "안녕하세요")))
@@ -54,7 +57,7 @@
 	    (entity/make-animation-map hero)
 	    (entity/add-animation hero "walk-left" (list 0 1 2))
 	    (entity/add-animation hero "idle" (list 0))
-	    (setf (entity-current-animation hero) "walk-left")
+	    (setf (animatable-current-animation (entity-animatable hero)) "walk-left")
 	    (textbox/set-text hello-textbox renderer "안녕하세요")
 	    (sdl2:with-event-loop (:method :poll)
 	      (:mousebuttonup (:button button)
@@ -85,7 +88,12 @@
 		       (let ((action (trigger/get-enter-action-with-map-and-entity trigger-table tiled-map hero)))
 			 (when action (apply action (list hero))))
 		       (multiple-value-bind (cam-x cam-y)
-			   (tiled/clip-xy tiled-map (entity-x hero) (entity-y hero) camera-width camera-height)
+			   (when (entity-movable hero)
+			     (tiled/clip-xy tiled-map
+					    (movable-x (entity-movable hero))
+					    (movable-y (entity-movable hero))
+					    camera-width
+					    camera-height))
 			 (tiled/goto tiled-map cam-x cam-y)
 			 (tiled/render renderer tiled-map (sdl2:make-rect 0 0 camera-width camera-height))
 			 (entity/render hero renderer cam-x cam-y))

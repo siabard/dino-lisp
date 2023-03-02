@@ -66,7 +66,6 @@
 
 (defun panel/render (panel renderer x y w h)
   (multiple-value-bind (x y w h) (panel/tween-xywh panel x y w h)
-
     (let* ((panel-texture     (panel-struct-texture panel))
 	     (panel-atlas       (panel-struct-atlas panel))
 	     (panel-top-left    (nth 0 panel-atlas))

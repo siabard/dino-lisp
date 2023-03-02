@@ -32,7 +32,9 @@
 
 
 (defun trigger/get-enter-action-with-map-and-entity (trigger-table tiled-map entity)
-  (let* ((x (entity-x entity))
-	 (y (entity-y entity))
-	 (position (tiled/coord-to-tile-position tiled-map x y)))
-    (trigger/get-enter-action trigger-table (car position) (cadr position))))
+  (when (entity-movable entity)
+    (let* ((movable (entity-movable entity))
+	   (x (movable-x movable))
+	   (y (movable-y movable))
+	   (position (tiled/coord-to-tile-position tiled-map x y)))
+      (trigger/get-enter-action trigger-table (car position) (cadr position)))))

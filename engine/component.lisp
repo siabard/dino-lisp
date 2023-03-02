@@ -1,6 +1,6 @@
 (in-package #:dino-lisp)
 
-(defstruct movable speed max-speed x y dx dy new-x new-y)
+(defstruct movable speed maxspeed x y dx dy new-x new-y)
 
 (defstruct animatable
   animation-span
@@ -12,6 +12,8 @@
 (defstruct collidable rect channel)
 
 (defstruct renderable texture width height atlas)
+
+(defstruct controlable flag)
 
 ;;; typep를 이용해서 타입의 동일성을 검증할 수 있다.
 ;;; (typep (make-movable) 'movable) -> T
