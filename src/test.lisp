@@ -41,3 +41,51 @@
 	  (sdl2:destroy-texture panel-texture)
 	  )
 	))))
+
+
+(defparameter *ttt* nil)
+
+
+;; TODO 유니코드 입력하다가 ascii 코드가 왔을 때 ascii 코드가 먼저오고 그 다음에
+;; 유니코드가 온다?
+;; 입력된 text 가 ascii면..
+;; 1. 현재 mode가 unicode 면..
+;;    1.1 일단 버퍼에 넣고.. ascii 로 전환한다.
+;; 2. 현재 mode가 ascii 면..
+;;    2.1  코드를 그대로 넣는다.
+;; 입력된 text 가 unicode면..
+;; 1. 현재 mode가 unicode 면..
+;;    1.1 코드를 그대로 넣는다.
+;; 2. 현재 mode 가 ascii 면..
+;;
+(defun test/text-input ()
+  (sdl2:with-init (:everything)
+    (sdl2:with-window (win :title "text input" :w 640 :h 480)
+      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	(let ((input-mode "")
+	      (input-text nil)
+	      (buffer nil))
+	  (init-font "ascii"  "assets/ascii.png")
+	  (init-font "hangul" "assets/hangul.png")
+	  (sdl2-ffi.functions:sdl-start-text-input)
+	  (sdl2:with-event-loop (:method :poll)
+	    (:textinput (:text text)
+			(format t "\"~A\"~%" text)
+			(push text input-text))
+	    (:idle ()
+		   (sdl2:set-render-draw-color renderer 0 0 0 255)
+		   (sdl2:render-clear renderer)
+		   (sdl2:set-render-draw-color renderer 255 255 255 255)
+		   (sdl2:render-draw-rect renderer (sdl2:make-rect 96 96 158 88))
+		   (when (< 0
+			    (length input-text))
+		     (draw-string renderer 104 104
+				  (reverse (reduce (lambda (a b)
+						     (concatenate 'string a b))
+						   input-text))))
+		   (sdl2:render-present renderer)
+		   (sdl2:delay 40))
+	    (:quit ()
+		   (sdl2-ffi.functions:sdl-stop-text-input)
+		   (delete-global-texture)
+		   t)))))))
