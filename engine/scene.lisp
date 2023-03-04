@@ -56,6 +56,7 @@
 ;;; 그냥 뿌린다.
 
 ;;; 마지막에 출력할 때에는 zoom을 width / height 곱한다.
+;;; 그리고 제한된 영역으로 clipping 함으로써 끝낸다.
 
 (defmethod render-scene (scene renderer)
   (let* ((texture (sdl2:create-texture renderer
@@ -64,10 +65,10 @@
 				       (width scene)
 				       (height scene)))
 	 (clip-texture (sdl2:create-texture renderer
-				       sdl2:+pixelformat-rgba8888+
-				       sdl2-ffi:+sdl-textureaccess-target+
-				       (width scene)
-				       (height scene)))
+					    sdl2:+pixelformat-rgba8888+
+					    sdl2-ffi:+sdl-textureaccess-target+
+					    (width scene)
+					    (height scene)))
 	 (background (background scene)))
     (sdl2:set-render-target renderer texture)
     (sdl2:set-render-draw-color renderer 0 0 0 255 )
@@ -94,8 +95,8 @@
     (sdl2:render-copy-ex renderer
 			 texture
 			 :source-rect (sdl2:make-rect 0 0 (width scene) (height scene))
-			 :dest-rect (sdl2:make-rect (x scene)
-						    (y scene)
+			 :dest-rect (sdl2:make-rect 0
+						    0
 						    (* (zoom scene) (width scene))
 						    (* (zoom scene) (height scene))))
     (sdl2:set-render-target renderer nil)

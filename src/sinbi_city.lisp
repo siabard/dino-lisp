@@ -56,11 +56,13 @@
 	       (states nil)
 	       (intro-state (make-instance 'game-state
 					   :scenes (list (make-scene "intro"
-								      :width 480
-								      :height 320
-								      :zoom 2
-								      :entities (build-entity-from-texts texture *intro-logo*)
-								      :camera (sdl2:make-rect 0 0 240 160))))))
+								     :x 0
+								     :y 0
+								     :width 480
+								     :height 320
+								     :zoom 2
+								     :entities (build-entity-from-texts texture *intro-logo*)
+								     :camera (sdl2:make-rect 0 0 240 160))))))
 	  (push intro-state states)
 	  (sdl2:with-event-loop (:method :poll)
 	    (:idle ()
