@@ -57,7 +57,7 @@
 	    (entity/make-animation-map hero)
 	    (entity/add-animation hero "walk-left" (list 0 1 2))
 	    (entity/add-animation hero "idle" (list 0))
-	    (setf (animatable-current-animation (entity-animatable hero)) "walk-left")
+	    (entity/set-current-animation hero "walk-left")
 	    (textbox/set-text hello-textbox renderer "안녕하세요")
 	    (sdl2:with-event-loop (:method :poll)
 	      (:mousebuttonup (:button button)

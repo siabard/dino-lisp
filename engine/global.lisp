@@ -14,6 +14,20 @@
 (defparameter *loaded-images* (make-hash-table :test #'equal))
 (defparameter *map* (make-hash-table :test #'equal))
 
+;;; 현재 게임의 state를 알려주는 전역변수
+
+(defparameter *game-state* nil)
+
+;;; 각각의 state
+;; 'intro-state     인트로 켜는 상태
+;; 'game-state      게임을 진행하는 상태
+;; 'dialog-state    대화를 진행중인 상태
+;; 'inventory-state 인벤토리 창을 연 상태
+;; 'stat-state      상태창을 연 상태
+;; 'end-state       게임 오버 화면을 보여주는 상태
+;; 'option-state    옵션 설정하는 상태
+
+
 (defun init-global ()
   (setf *renderer* nil)
   (clrhash *textures*)

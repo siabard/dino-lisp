@@ -79,6 +79,9 @@
 	(incf (movable-y movable) 4)))))
 
 
+(defun entity/set-current-animation (entity name)
+  (when (entity-animatable entity)
+    (setf (animatable-current-animation (entity-animatable entity)) name)))
 
 ;; 벡터의 내적
 (defun inner-product (x y)

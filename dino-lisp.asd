@@ -39,6 +39,7 @@
 	       (:module "src"
 		:components ((:file "test")
 			     (:file "main")
+			     (:file "sinbi_city")
 			     (:file "inventory_test")))
 	       (:module "util"
 		:components ((:file "swank")
