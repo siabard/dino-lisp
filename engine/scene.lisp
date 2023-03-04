@@ -106,6 +106,14 @@
 						    (y scene)
 						    (width scene)
 						    (height scene)))
+    ;; 외곽선을 긋는다.
+    (sdl2:set-render-draw-color renderer 255 255 255 255)
+    (sdl2:render-draw-rect renderer (sdl2:make-rect  (+ 4 (x scene))
+						     (+ 4 (y scene))
+						     (- (width scene) 8)
+						     (- (height scene) 8)))
+
 
     (sdl2:destroy-texture texture)
-    (sdl2:destroy-texture clip-texture)))
+    (sdl2:destroy-texture clip-texture))
+  )

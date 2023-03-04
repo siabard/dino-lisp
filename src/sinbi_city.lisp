@@ -50,19 +50,20 @@
 (defun sinbi-main ()
   (sdl2:with-init (:everything)
     (init-game)
-    (sdl2:with-window (win :title "Sinbi city" :w 800 :h 600 :flags '(:shown))
+    (sdl2:with-window (win :title "Sinbi city" :w 640 :h 480 :flags '(:shown))
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(let* ((texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root*)))
 	       (states nil)
 	       (intro-state (make-instance 'game-state
 					   :scenes (list (make-scene "intro"
-								      :width 320
-								      :height 160
+								      :width 480
+								      :height 320
 								      :zoom 2
 								      :entities (build-entity-from-texts texture *intro-logo*)
-								      :camera (sdl2:make-rect 0 0 320 160))))))
+								      :camera (sdl2:make-rect 0 0 240 160))))))
 	  (sdl2:with-event-loop (:method :poll)
 	    (:idle ()
+		   (sdl2:set-render-draw-color renderer 0 0 0 255)
 		   (sdl2:render-clear renderer)
 		   (render-state intro-state renderer)
 		   (sdl2:render-present renderer)
