@@ -58,6 +58,7 @@
 					   :scenes (list (make-scene "intro"
 								      :width 320
 								      :height 160
+								      :zoom 2
 								      :entities (build-entity-from-texts texture *intro-logo*)
 								      :camera (sdl2:make-rect 0 0 320 160))))))
 	  (sdl2:with-event-loop (:method :poll)

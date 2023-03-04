@@ -63,6 +63,11 @@
 				       sdl2-ffi:+sdl-textureaccess-target+
 				       (width scene)
 				       (height scene)))
+	 (clip-texture (sdl2:create-texture renderer
+				       sdl2:+pixelformat-rgba8888+
+				       sdl2-ffi:+sdl-textureaccess-target+
+				       (width scene)
+				       (height scene)))
 	 (background (background scene)))
     (sdl2:set-render-target renderer texture)
     (sdl2:set-render-draw-color renderer 0 0 0 255 )
@@ -76,16 +81,16 @@
 		     (sdl2:rect-y (camera scene))))
     (when background
       (let ((background-rect (sdl2:make-rect 0
-					  0
-					  (sdl2:texture-width background)
-					  (sdl2:texture-height background))))
+					     0
+					     (sdl2:texture-width background)
+					     (sdl2:texture-height background))))
 	(sdl2:render-copy-ex renderer
 			     background
 			     :source-rect background-rect
 			     :dest-rect (sdl2:make-rect 0 0
 							(sdl2:rect-width (camera scene))
 							(sdl2:rect-height (camera scene))))))
-    (sdl2:set-render-target renderer nil)
+    (sdl2:set-render-target renderer clip-texture)
     (sdl2:render-copy-ex renderer
 			 texture
 			 :source-rect (sdl2:make-rect 0 0 (width scene) (height scene))
@@ -93,4 +98,14 @@
 						    (y scene)
 						    (* (zoom scene) (width scene))
 						    (* (zoom scene) (height scene))))
-    (sdl2:destroy-texture texture)))
+    (sdl2:set-render-target renderer nil)
+    (sdl2:render-copy-ex renderer
+			 clip-texture
+			 :source-rect (sdl2:make-rect 0 0 (width scene) (height scene))
+			 :dest-rect (sdl2:make-rect (x scene)
+						    (y scene)
+						    (width scene)
+						    (height scene)))
+
+    (sdl2:destroy-texture texture)
+    (sdl2:destroy-texture clip-texture)))
