@@ -47,6 +47,17 @@
   (init-font "ascii" "assets/ascii.png")
   (init-font "hangul" "assets/hangul.png"))
 
+
+(defun make-intro-scene (texture logo-map)
+  (make-scene "intro"
+	      :x 0
+	      :y 0
+	      :width 480
+	      :height 320
+	      :zoom 2
+	      :entities (build-entity-from-texts texture logo-map)
+	      :camera (sdl2:make-rect 0 0 240 160)))
+
 (defun sinbi-main ()
   (sdl2:with-init (:everything)
     (init-game)
@@ -55,14 +66,7 @@
 	(let* ((texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root*)))
 	       (states nil)
 	       (intro-state (make-instance 'game-state
-					   :scenes (list (make-scene "intro"
-								     :x 0
-								     :y 0
-								     :width 480
-								     :height 320
-								     :zoom 2
-								     :entities (build-entity-from-texts texture *intro-logo*)
-								     :camera (sdl2:make-rect 0 0 240 160))))))
+					   :scenes (list (make-intro-scene texture *intro-logo*)))))
 	  (push intro-state states)
 	  (sdl2:with-event-loop (:method :poll)
 	    (:idle ()

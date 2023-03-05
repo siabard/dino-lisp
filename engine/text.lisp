@@ -39,3 +39,28 @@
 
 (defun text/destroy-font (font)
   (safe-close-font font))
+
+
+(defun split-list (list len)
+ ;; (split-list '(a b c d e f g) 3) => ((A B C) (D E F) (G))
+ "Splits the list into sublists of length len. The last element might have fewer than len elements."
+    (do* ((n 1 (1+ n))
+          (l list (cdr l))
+          (l1 nil)
+          (res nil) )
+         ((null l) (progn (when l1 (push (nreverse l1) res))(nreverse   res)))
+        (push (car l) l1)
+        (when (= n len)
+            (push (nreverse l1) res)
+            (setq l1 nil)
+            (setq n 0) )))
+
+(defun chunk-text (texts width height)
+  (let ((chunk '())
+	(maxx (floor width 16))
+	(maxy (floor height 16)))
+    (dolist (text texts)
+      (push (mapcar (lambda (lst) (coerce lst 'string))
+		    (split-list (coerce text 'list) maxx))
+	    chunk))
+    (split-list  (reduce #'append  (reverse  chunk)) maxy)))

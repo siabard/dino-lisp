@@ -35,6 +35,15 @@
 		 :guis guis
 		 :camera camera))
 
+;; entity 처리
+
+
+;; gui 처리
+
+
+
+
+
 (defgeneric update-scene (scene dt &key keyboard mouse)
   (:documentation "update all entities in scene"))
 

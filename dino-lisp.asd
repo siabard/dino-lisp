@@ -17,6 +17,7 @@
 		:components ((:file "renderer")
 			     (:file "sprite")
 			     (:file "global")
+			     (:file "dialog")
 			     (:file "tiled")
 			     (:file "util")
 			     (:file "tween")

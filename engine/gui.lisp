@@ -154,6 +154,19 @@
 		   :texts texts)))
 
 
+;;; dialog 내용 바꾸기
+(defgeneric set-dialog-window-texts (dialog-window texts)
+  (:documentation "내용을 바꾸면서 w, h 도 같이 변경 "))
+
+
+(defmethod set-dialog-window-texts (dialog-window texts)
+  (let ((full-length (apply #'max 0 (mapcar #'length texts))))
+    (when (> (* 16 full-length) (- (w dialog-window) 16))
+      (setf (w dialog-window) (+ 16 (* 16 full-length))))
+    (when (> (* 16 (length texts)) (- (h dialog-window) 16))
+      (setf (h dialog-window) (+ 16 (* 16 (length texts)))))
+    (setf (texts dialog-window) texts)))
+
 ;;;; rendering 하기
 (defgeneric render-dialog-window (dialog-window &key renderer)
   (:documentation "render dialog window"))

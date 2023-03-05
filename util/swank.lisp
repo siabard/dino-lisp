@@ -13,3 +13,8 @@
   (ptr :pointer)
   (val :int)
   (size :int))
+
+
+;; core 를 생성하는 함수
+(defun save-core ()
+  (sb-ext:save-lisp-and-die #p"target/core_latest" :executable t))

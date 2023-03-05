@@ -14,7 +14,11 @@
 (defparameter *loaded-images* (make-hash-table :test #'equal))
 (defparameter *map* (make-hash-table :test #'equal))
 
+;;;
 ;;; 현재 게임의 state를 알려주는 전역변수
+;;; 현재까지 완료된 내역들이나 통과한 정보들이 들어있게된다.
+(defparameter *game-progress* nil)
+
 
 (defparameter *game-state* nil)
 
