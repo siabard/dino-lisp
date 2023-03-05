@@ -19,6 +19,15 @@
 ;;; 현재까지 완료된 내역들이나 통과한 정보들이 들어있게된다.
 (defparameter *game-progress* nil)
 
+;;; 존재하는 퀘스트 내역
+(defparameter *quests* (make-hash-table :test #'equal))
+
+;;; quest 목록을 저장한다.
+(defparameter *quest-log* (make-hash-table :test #'equal))
+
+;; dialog db
+(defparameter *dialog-db* (make-hash-table :test #'equal))
+
 
 (defparameter *game-state* nil)
 
