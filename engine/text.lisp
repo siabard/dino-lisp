@@ -55,12 +55,14 @@
             (setq l1 nil)
             (setq n 0) )))
 
+
+;; 텍스트(스트링의 배열)을 일정 크기의 가로/세로에 맞는 크기로
+;; 자른 텍스트 뭉치 배열로 만들기
+
 (defun chunk-text (texts width height)
-  (let ((chunk '())
-	(maxx (floor width 16))
-	(maxy (floor height 16)))
+  (let ((chunk '()))
     (dolist (text texts)
-      (push (mapcar (lambda (lst) (coerce lst 'string))
-		    (split-list (coerce text 'list) maxx))
+      (push (mapcar (lambda (lst) (string-trim " " (coerce lst 'string)))
+		    (split-list (coerce text 'list) width))
 	    chunk))
-    (split-list  (reduce #'append  (reverse  chunk)) maxy)))
+    (split-list  (reduce #'append  (reverse  chunk)) height)))

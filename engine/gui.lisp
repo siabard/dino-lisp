@@ -140,17 +140,24 @@
 				  :accessor w)
 			       (h :initarg :h
 				  :accessor h)
+			       (title :initarg :title
+				      :accessor title)
 			       (texts :initarg :texts
 				      :accessor texts)))
 
 ;;;; 생성자
-(defun make-dialog-window (x y texts)
+;;; title 이 있으면... height가 20 (16 + margin 4) 만큼
+;;; title 을 출력할 공간을 확보한다.
+(defun make-dialog-window (x y &key title texts)
   (let ((full-length (apply #'max 0 (mapcar #'length texts))))
     (make-instance 'dialog-window
 		   :x x
 		   :y y
 		   :w (+ 16 (* full-length 16))
-		   :h (+ 16 (* (length texts) 16))
+		   :h (cond ((eq nil title)
+			     (+ 16 (* (length texts) 16)))
+			    (t (+ 36 (* (length texts) 16))))
+		   :title title
 		   :texts texts)))
 
 
@@ -160,11 +167,14 @@
 
 
 (defmethod set-dialog-window-texts (dialog-window texts)
-  (let ((full-length (apply #'max 0 (mapcar #'length texts))))
+  (let ((full-length (apply #'max 0 (mapcar #'length texts)))
+	(title (title dialog-window)))
     (when (> (* 16 full-length) (- (w dialog-window) 16))
       (setf (w dialog-window) (+ 16 (* 16 full-length))))
     (when (> (* 16 (length texts)) (- (h dialog-window) 16))
-      (setf (h dialog-window) (+ 16 (* 16 (length texts)))))
+      (setf (h dialog-window)
+	    (cond ((eq title nil) (+ 16 (* 16 (length texts))))
+		  (t (+ 36 (* 16 (length texts)))))))
     (setf (texts dialog-window) texts)))
 
 ;;;; rendering 하기
@@ -176,15 +186,24 @@
 	 (y (y dialog-window))
 	 (w (w dialog-window))
 	 (h (h dialog-window))
+	 (title (title dialog-window))
 	 (texts (texts dialog-window)))
     ;; 외곽선 긋기
     (sdl2:set-render-draw-color renderer 0 0 0 255)
     (sdl2:render-fill-rect renderer (sdl2:make-rect x y w h))
     (sdl2:set-render-draw-color renderer 255 255 255 255)
     (sdl2:render-draw-rect renderer (sdl2:make-rect (+ x 4) (+ y 4) (- w 8) (- h 8)))
+    ;; 타이틀 있으면 타이틀 쓰기
+    (when title
+      (draw-string renderer (+ x 8) (+ y 8) title))
     ;; 내용 쓰기
     (dolist (text texts)
-      (draw-string renderer (+ x 8) (+ y 8) text)
+      (draw-string renderer
+		   (+ x 8)
+		   (+ y
+		      (cond ((eq nil title) 8)
+			    (t 28)))
+		   text)
       (incf y 16))))
 
 (defmethod render-gui ((gui dialog-window) renderer)

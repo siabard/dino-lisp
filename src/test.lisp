@@ -89,3 +89,29 @@
 		   (sdl2-ffi.functions:sdl-stop-text-input)
 		   (delete-global-texture)
 		   t)))))))
+
+
+(defun test/dialog-test ()
+  (sdl2:with-init (:everything)
+    (sdl2:with-window (win :title "text input" :w 640 :h 480)
+      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	(let ((test-dialog (make-dialog-window 90 100 :title "테스트"
+					       :texts '("이 글은 테스트입니다."
+							"모쪼록 잘 나오길"))))
+	  (init-font "ascii"  "assets/ascii.png")
+	  (init-font "hangul" "assets/hangul.png")
+
+	  (sdl2:with-event-loop (:method :poll)
+	    (:idle ()
+		   (sdl2:set-render-draw-color renderer 0 0 0 255)
+		   (sdl2:render-clear renderer)
+		   (sdl2:set-render-draw-color renderer 255 255 255 255)
+
+		   (render-dialog-window test-dialog :renderer renderer)
+
+		   (sdl2:render-present renderer)
+		   (sdl2:delay 40))
+	    (:quit ()
+		   (sdl2-ffi.functions:sdl-stop-text-input)
+		   (delete-global-texture)
+		   t)))))))
