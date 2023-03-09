@@ -95,13 +95,22 @@
   (sdl2:with-init (:everything)
     (sdl2:with-window (win :title "text input" :w 640 :h 480)
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
-	(let ((test-dialog (make-dialog-window 90 100 :title "테스트"
-					       :texts '("이 글은 테스트입니다."
-							"모쪼록 잘 나오길"))))
+	(let* ((long-texts '("이 글은 정말 긴 글입니다. 그래서 중간이 잘려야하죠."
+			     "물론 이런 정책이 늘 있는 것은 아니지만 캐릭터간의 대화는 당연히 잘려야하지 않을가요?"))
+	       (test-dialog (make-dialog-window 90 100
+						12 4
+						:title "테스트"
+						:texts long-texts)))
 	  (init-font "ascii"  "assets/ascii.png")
 	  (init-font "hangul" "assets/hangul.png")
 
 	  (sdl2:with-event-loop (:method :poll)
+	    (:mousebuttondown ()
+			      (onclick-dialog-window test-dialog
+						     (lambda (dialog)
+						       (when (< (index dialog)
+								(- (length (texts dialog)) 1))
+							 (incf (index dialog))))))
 	    (:idle ()
 		   (sdl2:set-render-draw-color renderer 0 0 0 255)
 		   (sdl2:render-clear renderer)

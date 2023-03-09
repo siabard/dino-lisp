@@ -132,6 +132,8 @@
 
 
 ;; dialog window
+;; 이제는 그럼 texts 자체를 chunk로 만들어서 가지고 다니도록 하자.
+
 (defclass dialog-window (gui) ((x :initarg :x
 				  :accessor x)
 			       (y :initarg :y
@@ -140,34 +142,45 @@
 				  :accessor w)
 			       (h :initarg :h
 				  :accessor h)
+			       (index :initarg :index
+				      :accessor index)
 			       (title :initarg :title
 				      :accessor title)
+			       (texts-length :initarg :texts-length
+					     :accessor texts-length)
 			       (texts :initarg :texts
 				      :accessor texts)))
 
 ;;;; 생성자
 ;;; title 이 있으면... height가 20 (16 + margin 4) 만큼
 ;;; title 을 출력할 공간을 확보한다.
-(defun make-dialog-window (x y &key title texts)
-  (let ((full-length (apply #'max 0 (mapcar #'length texts))))
+(defun make-dialog-window (x y w h &key title texts)
+  (let* ((chunked-texts (chunk-text texts w h))
+	 (texts-length (length chunked-texts))
+	 (first-para (car chunked-texts))
+	 (full-length (apply #'max 0 (mapcar #'length first-para))))
     (make-instance 'dialog-window
 		   :x x
 		   :y y
 		   :w (+ 16 (* full-length 16))
 		   :h (cond ((eq nil title)
-			     (+ 16 (* (length texts) 16)))
-			    (t (+ 36 (* (length texts) 16))))
+			     (+ 16 (* (length first-para) 16)))
+			    (t (+ 36 (* (length first-para) 16))))
+		   :index 0
 		   :title title
-		   :texts texts)))
+		   :texts-length texts-length
+		   :texts chunked-texts)))
 
 
 ;;; dialog 내용 바꾸기
-(defgeneric set-dialog-window-texts (dialog-window texts)
+(defgeneric set-dialog-window-texts (dialog-window texts w h)
   (:documentation "내용을 바꾸면서 w, h 도 같이 변경 "))
 
 
-(defmethod set-dialog-window-texts (dialog-window texts)
-  (let ((full-length (apply #'max 0 (mapcar #'length texts)))
+(defmethod set-dialog-window-texts (dialog-window texts w h)
+  (let* ((chunked-texts (chunk-text texts w h))
+	 (texts-length (length chunked-texts))
+	 (full-length (apply #'max 0 (mapcar #'length (car chunked-texts))))
 	(title (title dialog-window)))
     (when (> (* 16 full-length) (- (w dialog-window) 16))
       (setf (w dialog-window) (+ 16 (* 16 full-length))))
@@ -175,7 +188,9 @@
       (setf (h dialog-window)
 	    (cond ((eq title nil) (+ 16 (* 16 (length texts))))
 		  (t (+ 36 (* 16 (length texts)))))))
-    (setf (texts dialog-window) texts)))
+    (setf (index dialog-window) 0)
+    (setf (texts dialog-window) chunked-texts)
+    (setf (texts-length dialog-window) texts-length)))
 
 ;;;; rendering 하기
 (defgeneric render-dialog-window (dialog-window &key renderer)
@@ -187,7 +202,8 @@
 	 (w (w dialog-window))
 	 (h (h dialog-window))
 	 (title (title dialog-window))
-	 (texts (texts dialog-window)))
+	 (texts (texts dialog-window))
+	 (current-texts (elt texts (index dialog-window))))
     ;; 외곽선 긋기
     (sdl2:set-render-draw-color renderer 0 0 0 255)
     (sdl2:render-fill-rect renderer (sdl2:make-rect x y w h))
@@ -197,7 +213,7 @@
     (when title
       (draw-string renderer (+ x 8) (+ y 8) title))
     ;; 내용 쓰기
-    (dolist (text texts)
+    (dolist (text  current-texts)
       (draw-string renderer
 		   (+ x 8)
 		   (+ y
@@ -208,3 +224,10 @@
 
 (defmethod render-gui ((gui dialog-window) renderer)
   (render-dialog-window gui :renderer renderer))
+
+;; 클릭시 처리
+(defgeneric onclick-dialog-window (dialog-window callback)
+  (:documentation "method for onclick"))
+
+(defmethod onclick-dialog-window (dialog-window callback)
+  (funcall callback dialog-window))
