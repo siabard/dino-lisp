@@ -213,7 +213,7 @@
     (when title
       (draw-string renderer (+ x 8) (+ y 8) title))
     ;; 내용 쓰기
-    (dolist (text  current-texts)
+    (dolist (text current-texts)
       (draw-string renderer
 		   (+ x 8)
 		   (+ y
