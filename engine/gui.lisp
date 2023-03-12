@@ -231,3 +231,67 @@
 
 (defmethod onclick-dialog-window (dialog-window callback)
   (funcall callback dialog-window))
+
+;; choices
+
+(defclass choice-dialog (gui)
+  ((x :initarg :x
+      :accessor x)
+   (y :initarg :y
+      :accessor y)
+   (item-width :initarg :item-width
+	       :accessor item-width)
+   (item-height :initarg :item-height
+		:accessor item-height)
+   (datasource :initarg :datasource
+	       :accessor datasource)
+   (columns :initarg :columns
+	    :accessor columns)
+   (focus-x :initarg :focus-x
+	    :accessor focus-x)
+   (focus-y :initarg :focus-y
+	    :accessor focus-y)
+   (spacing-x :initarg :spacing-x
+	      :accessor spacing-x)
+   (spacing-y :initarg :spacing-y
+	      :accessor spacing-y)
+   (cursor :initarg :cursor
+	   :accessor cursor)
+   (show-cursor-p :initarg :show-cursor-p
+		  :accessor show-cursor-p)
+   (max-rows :initarg :max-rows
+	     :accessor max-rows)
+   (display-start :initarg :display-start
+		  :accessor display-start)
+   (display-rows :initarg :display-rows
+		 :accessor display-rows)
+   (on-selection :initarg :on-selection
+		 :accessor on-selection)
+   (render-choice-item :initarg :render-choice-item
+		       :accessor render-choice-item)))
+
+(defun make-choice-dialog (x y &key
+				 datasource
+				 item-width
+				 item-height
+				 (columns 1)
+				 (focus-x 1)
+				 (focus-y 1)
+				 (spacing-x 128)
+				 (spacing-y 24)
+				 (show-cursor-p T)
+				 rows
+				 (display-start 1)
+				 (on-selection (lambda () ))
+				 (render-choice-item (lambda () )))
+  (make-instance 'choice-dialog
+		 :x x :y y
+		 :item-width item-width :item-height item-height
+		 :focus-x focus-x :focus-y focus-y
+		 :spacing-x spacing-x :spacing-y spacing-y
+		 :show-cursor-p show-cursor-p
+		 :max-rows (cond (rows rows)
+				 (t (length  datasource)))
+		 :display-start display-start
+		 :on-selection on-selection
+		 :render-choice-item render-choice-item))
