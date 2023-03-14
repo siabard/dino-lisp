@@ -247,15 +247,14 @@
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(init-font "ascii"  "assets/ascii.png")
 	(init-font "hangul" "assets/hangul.png")
-	(let ((scale-x (/ 800 320))
-	      (scale-y (/ 600 240))
-	      (map (make-gamemap 20 20))
-	      (textbox (make-dialog-window 40
+	(let ((textbox (make-dialog-window 40
 					   60
-					   '("Hello World"
-					     "안녕하세요."
-					     "숫자 1234 number"))))
-	  (set-map-from map :str *map-str*)
+					   12
+					   4
+					   :title "제목"
+					   :texts '("Hello World"
+						    "안녕하세요."
+						    "숫자 1234 number"))))
 	  (sdl2:with-event-loop (:method :poll)
 	    (:quit ()
 		   (format t "END")
@@ -264,7 +263,6 @@
 
 		   (sdl2:set-render-draw-color renderer 0 0 0 255 )
 		   (sdl2:render-clear renderer)
-		   (render map :renderer renderer )
 
 		   (render-dialog-window textbox :renderer renderer)
 

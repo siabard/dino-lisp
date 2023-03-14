@@ -131,6 +131,27 @@
   (:documentation "rendering gui"))
 
 
+(defgeneric set-pos-gui (gui new-x new-y)
+  (:documentation "set x, y position"))
+
+(defmethod set-pos-gui (gui new-x new-y)
+  (setf (x gui) new-x)
+  (setf (y gui) new-y))
+
+;; 일반 gui 텍스트 (label)
+(defclass label (gui)
+  ((x :initarg :x
+      :accessor x)
+   (y :initarg :y
+      :accessor y)
+   (content :initarg :content
+	    :accessor content)))
+
+(defmethod render-gui ((gui label) renderer)
+  (draw-string renderer
+	       (x gui)
+	       (y gui)
+	       (list  (content gui))))
 ;; dialog window
 ;; 이제는 그럼 texts 자체를 chunk로 만들어서 가지고 다니도록 하자.
 
@@ -345,5 +366,6 @@
 		 (sprite/render cursor renderer))
 	       (let* ((dest-x (+ origin-x cursor-width (* pos-x (+ cursor-width item-width))))
 		      (dest-y (+ origin-y (* pos-y item-height))))
-		 (draw-string renderer dest-x dest-y (list item)))
+		 (set-pos-gui item dest-x dest-y)
+		 (render-gui item renderer))
 	       (incf pos-x)))))
