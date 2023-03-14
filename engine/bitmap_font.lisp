@@ -1,4 +1,5 @@
 ;;;; bitmap_font.lisp
+;; TODO scale-x scale-y 를 받아서 해당 값으로 확대/축소해서 렌더링할 것
 
 (in-package #:dino-lisp)
 
@@ -173,7 +174,9 @@
 						   (rect/logical->physical (+ x (* 16 idx))
 									   y
 									   16
-									   16)
+									   16
+									   :sx sx
+									   :sy sy)
 						  (sdl2:make-rect zx zy zw zh))
 				    :angle 0
 				    :center (sdl2:make-point 0 0)
