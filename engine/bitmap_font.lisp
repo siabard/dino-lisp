@@ -122,7 +122,7 @@
 
 ;;; 텍스트를 출력하는 기능
 ;;; 한글인 경우와 아스키에 따른 경우를 모두 계산할 것
-(defun draw-string (renderer x y texts)
+(defun draw-string (renderer x y texts &key (sx 1) (sy 1))
   (let* ((charcodes (mapcar #'char-code (coerce texts 'list)))
 	 (idx 0)
 	 (texture (sdl2:create-texture renderer
@@ -132,43 +132,54 @@
     (sdl2:set-texture-blend-mode texture sdl2-ffi:+sdl-blendmode-blend+)
 
     (dolist (charcode charcodes)
-      (progn
-	(cond ((hangulp charcode)
-	       (cffi:with-foreign-pointer (pixels (* 16 16 4))
-		 (memset pixels 0 (* 16 16 4))
-		 (write-hangul-font-to-pointer (gethash "hangul" *loaded-images*)
-					       pixels
-					       charcode)
-		 (sdl2:update-texture texture
-				      (sdl2:make-rect 0 0 16 16)
+      (cond ((hangulp charcode)
+	     (cffi:with-foreign-pointer (pixels (* 16 16 4))
+	       (memset pixels 0 (* 16 16 4))
+	       (write-hangul-font-to-pointer (gethash "hangul" *loaded-images*)
+					     pixels
+					     charcode)
+	       (sdl2:update-texture texture
+				    (sdl2:make-rect 0 0 16 16)
+				    pixels
+				    (* 16 4))
+	       (sdl2:render-copy-ex renderer
+				    texture
+				    :source-rect (sdl2:make-rect 0 0 16 16)
+				    :dest-rect (multiple-value-bind (zx zy zw zh)
+						   (rect/logical->physical (+ x (* 16 idx))
+									   y
+									   16
+									   16
+									   :sx sx
+									   :sy sy)
+						   (sdl2:make-rect zx zy zw zh))
+				    :angle 0
+				    :center (sdl2:make-point 0 0)
+				    :flip nil)))
+	    ((asciip charcode)
+	     (cffi:with-foreign-pointer (pixels (* 8 16 4))
+	       (memset pixels 0 (* 8 16 4))
+	       (write-font-to-pointer (gethash "ascii" *loaded-images*)
 				      pixels
-				      (* 16 4))
-		 (sdl2:render-copy-ex renderer
-				      texture
-				      :source-rect (sdl2:make-rect 0 0 16 16)
-				      :dest-rect (sdl2:make-rect (+ x (* 16 idx)) y 16 16)
-				      :angle 0
-				      :center (sdl2:make-point 0 0)
-				      :flip nil)))
-	      ((asciip charcode)
-	       (cffi:with-foreign-pointer (pixels (* 8 16 4))
-		 (memset pixels 0 (* 8 16 4))
-		 (write-font-to-pointer (gethash "ascii" *loaded-images*)
-					pixels
-					charcode)
-		 (sdl2:update-texture texture
-				      (sdl2:make-rect 0 0 8 16)
-				      pixels
-				      (* 8 4))
-		 (sdl2:render-copy-ex renderer
-				      texture
-				      :source-rect (sdl2:make-rect 0 0 8 16)
-				      :dest-rect (sdl2:make-rect (+ x (* 16 idx)) y 16 16)
-				      :angle 0
-				      :center (sdl2:make-point 0 0)
-				      :flip nil))))
+				      charcode)
+	       (sdl2:update-texture texture
+				    (sdl2:make-rect 0 0 8 16)
+				    pixels
+				    (* 8 4))
+	       (sdl2:render-copy-ex renderer
+				    texture
+				    :source-rect (sdl2:make-rect 0 0 8 16)
+				    :dest-rect (multiple-value-bind (zx zy zw zh)
+						   (rect/logical->physical (+ x (* 16 idx))
+									   y
+									   16
+									   16)
+						  (sdl2:make-rect zx zy zw zh))
+				    :angle 0
+				    :center (sdl2:make-point 0 0)
+				    :flip nil))))
 
-	(incf idx)))
+      (incf idx))
     (sdl2:destroy-texture texture)))
 
 
@@ -233,10 +244,8 @@
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(init-font "ascii"  "assets/ascii.png")
 	(init-font "hangul" "assets/hangul.png")
-	(let ((main-texture (sdl2:create-texture renderer
-						 sdl2:+pixelformat-rgb888+
-						 sdl2-ffi:+sdl-textureaccess-target+
-						 320 240))
+	(let ((scale-x (/ 800 320))
+	      (scale-y (/ 600 240))
 	      (map (make-gamemap 20 20))
 	      (textbox (make-dialog-window 40
 					   60
@@ -250,23 +259,11 @@
 		   t)
 	    (:idle ()
 
-		   (sdl2:set-render-target renderer main-texture)
 		   (sdl2:set-render-draw-color renderer 0 0 0 255 )
 		   (sdl2:render-clear renderer)
 		   (render map :renderer renderer )
-		   (draw-hangul renderer)
-		   (draw renderer)
+
 		   (render-dialog-window textbox :renderer renderer)
-
-		   (sdl2:set-render-target renderer nil)
-		   (sdl2:render-copy-ex renderer
-					main-texture
-					:source-rect (sdl2:make-rect 0 0 320 240)
-					:dest-rect (sdl2:make-rect 0 0 800 600)
-					:angle 0
-					:center (sdl2:make-point 0 0)
-					:flip nil)
-
 
 		   (sdl2:render-present renderer)
 		   (sdl2:delay 16)))))

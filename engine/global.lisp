@@ -14,6 +14,17 @@
 (defparameter *loaded-images* (make-hash-table :test #'equal))
 (defparameter *map* (make-hash-table :test #'equal))
 
+;; 실제 화면대비 그려야하는 화면 비례값
+;; 비례값에 맞추어서 모든 것은 그려져야함.
+;; scale-x = physical-width / logical-width
+;; scale-y = physical-height / logical-height
+;; 모든 texture는 logical-width, logical-height 기준으로 크기가 정렬
+;; 실제로 그려져야하는 크기는
+;; dest-rect-width = texture-width * scale-x
+;; dest-rect-height = texture-height * scale-y
+
+(defparameter *scale-x* 1)
+(defparameter *scale-y* 1)
 ;;;
 ;;; 현재 게임의 state를 알려주는 전역변수
 ;;; 현재까지 완료된 내역들이나 통과한 정보들이 들어있게된다.

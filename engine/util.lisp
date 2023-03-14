@@ -19,3 +19,7 @@
 (defun safe-close-font (font)
   (when (autowrap:valid-p font)
     (sdl2-ttf:close-font font)))
+
+;;; rect logical->physical
+(defun rect/logical->physical (x y w h &key (sx 1) (sy 1))
+  (values (* x sx) (* y sy) (* w sx) (* h sy)))
