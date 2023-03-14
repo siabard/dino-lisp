@@ -67,20 +67,20 @@
 (defun panel/render (panel renderer x y w h)
   (multiple-value-bind (x y w h) (panel/tween-xywh panel x y w h)
     (let* ((panel-texture     (panel-struct-texture panel))
-	     (panel-atlas       (panel-struct-atlas panel))
-	     (panel-top-left    (nth 0 panel-atlas))
-	     (panel-top-mid     (nth 1 panel-atlas))
-	     (panel-top-right   (nth 2 panel-atlas))
-	     (panel-mid-left    (nth 3 panel-atlas))
-	     (panel-mid-mid     (nth 4 panel-atlas))
-	     (panel-mid-right   (nth 5 panel-atlas))
-	     (panel-bot-left    (nth 6 panel-atlas))
-	     (panel-bot-mid     (nth 7 panel-atlas))
-	     (panel-bot-right   (nth 8 panel-atlas))
-	     (panel-width       (panel-struct-atlas-width panel))
-	     (panel-height      (panel-struct-atlas-height panel))
-	     (panel-width-span  (- w (* 2 panel-width)))
-	     (panel-height-span (- h (* 2 panel-height))))
+	   (panel-atlas       (panel-struct-atlas panel))
+	   (panel-top-left    (nth 0 panel-atlas))
+	   (panel-top-mid     (nth 1 panel-atlas))
+	   (panel-top-right   (nth 2 panel-atlas))
+	   (panel-mid-left    (nth 3 panel-atlas))
+	   (panel-mid-mid     (nth 4 panel-atlas))
+	   (panel-mid-right   (nth 5 panel-atlas))
+	   (panel-bot-left    (nth 6 panel-atlas))
+	   (panel-bot-mid     (nth 7 panel-atlas))
+	   (panel-bot-right   (nth 8 panel-atlas))
+	   (panel-width       (panel-struct-atlas-width panel))
+	   (panel-height      (panel-struct-atlas-height panel))
+	   (panel-width-span  (- w (* 2 panel-width)))
+	   (panel-height-span (- h (* 2 panel-height))))
       (when (and (> panel-width-span 0) (> panel-height-span))
 	(panel/draw-partial renderer panel-texture panel-top-left (sdl2:make-rect x y panel-width panel-height))
 	(panel/draw-partial renderer panel-texture panel-top-mid  (sdl2:make-rect (+  x panel-width) y panel-width-span panel-height))
@@ -181,7 +181,7 @@
   (let* ((chunked-texts (chunk-text texts w h))
 	 (texts-length (length chunked-texts))
 	 (full-length (apply #'max 0 (mapcar #'length (car chunked-texts))))
-	(title (title dialog-window)))
+	 (title (title dialog-window)))
     (when (> (* 16 full-length) (- (w dialog-window) 16))
       (setf (w dialog-window) (+ 16 (* 16 full-length))))
     (when (> (* 16 (length texts)) (- (h dialog-window) 16))
@@ -241,6 +241,10 @@
       :accessor y)
    (item-width :initarg :item-width
 	       :accessor item-width)
+   (texture :initarg :texture
+	    :accessor texture)
+   (atlas :initarg :atlas
+	  :accessor atlas)
    (item-height :initarg :item-height
 		:accessor item-height)
    (datasource :initarg :datasource
@@ -270,28 +274,76 @@
    (render-choice-item :initarg :render-choice-item
 		       :accessor render-choice-item)))
 
+
+
 (defun make-choice-dialog (x y &key
 				 datasource
 				 item-width
 				 item-height
+				 texture
+				 atlas
 				 (columns 1)
-				 (focus-x 1)
-				 (focus-y 1)
+				 (focus-x 0)
+				 (focus-y 0)
 				 (spacing-x 128)
 				 (spacing-y 24)
 				 (show-cursor-p T)
 				 rows
-				 (display-start 1)
+				 (display-start 0)
+				 display-rows
 				 (on-selection (lambda () ))
 				 (render-choice-item (lambda () )))
-  (make-instance 'choice-dialog
-		 :x x :y y
-		 :item-width item-width :item-height item-height
-		 :focus-x focus-x :focus-y focus-y
-		 :spacing-x spacing-x :spacing-y spacing-y
-		 :show-cursor-p show-cursor-p
-		 :max-rows (cond (rows rows)
-				 (t (length  datasource)))
-		 :display-start display-start
-		 :on-selection on-selection
-		 :render-choice-item render-choice-item))
+  (let* ((max-rows (cond (rows rows)
+			 (t (length datasource))))
+	 (display-rows (cond (display-rows display-rows)
+			     (t max-rows))))
+    (make-instance 'choice-dialog
+		   :x x :y y
+		   :item-width item-width :item-height item-height
+		   :focus-x focus-x :focus-y focus-y
+		   :spacing-x spacing-x :spacing-y spacing-y
+		   :show-cursor-p show-cursor-p
+		   :max-rows max-rows
+		   :columns columns
+		   :texture texture
+		   :atlas atlas
+		   :display-start display-start
+		   :display-rows display-rows
+		   :on-selection on-selection
+		   :render-choice-item render-choice-item)))
+
+(defmethod render-gui ((gui choice-dialog) renderer)
+  (let* ((origin-x  (x gui))
+	 (origin-y  (y gui))
+	 (focus-x   (focus-x gui))
+	 (focus-y   (focus-y gui))
+	 (display-start (display-start gui))
+	 (display-end (+ display-start (* (display-rows gui))))
+	 (cursor      (cursor gui))
+	 (cursor-width (sdl2:texture-width (sprite-texture cursor)))
+	 (cursor-height (sdl2:texture-height (sprite-texture cursor)))
+	 (item-width  (item-width gui))
+	 (item-height (item-height gui))
+	 (pos-x 0)
+	 (pos-y 0))
+    (loop for item-index from display-start to display-end
+	  do (let* ((item (elt (datasource gui) item-index))
+		    (pos (- item-index display-start)))
+	       (when (and (> pos 0)
+			  (= 0 (rem pos (columns gui))))
+		 (setf pos-x 0)
+		 (incf pos-y))
+	       (when (and (= pos-x focus-x)
+			  (= pos-y focus-y))
+		 (sprite/set-dest-rect cursor (sdl2:make-rect
+					       (+ origin-x (* pos-x
+							      (+ cursor-width item-width)))
+					       (+ origin-y (* pos-y item-height))
+					       cursor-width
+					       cursor-height))
+		 (sprite/set-source-rect cursor (sdl2:make-rect 0 0 cursor-width cursor-height))
+		 (sprite/render cursor renderer))
+	       (let* ((dest-x (+ origin-x cursor-width (* pos-x (+ cursor-width item-width))))
+		      (dest-y (+ origin-y (* pos-y item-height))))
+		 (draw-string renderer dest-x dest-y (list item)))
+	       (incf pos-x)))))
