@@ -378,3 +378,32 @@
 		 (set-pos-gui item dest-x dest-y)
 		 (render-gui item renderer))
 	       (incf pos-x)))))
+
+
+
+;; 키 인풋등
+(defgeneric process-key-event (gui scancode)
+  (:documentation "key event 처리"))
+
+(defmethod process-key-event ((gui choice-dialog) scancode)
+  (cond ((sdl2:scancode= scancode
+			 :scancode-up)
+	 (setf (focus-y gui)
+	       (max 0
+		    (- (focus-y gui) 1))))
+	((sdl2:scancode= scancode
+			 :scancode-down)
+	 (setf (focus-y gui)
+	       (min (round (- (/ (display-rows gui)
+				  (columns gui)) 1))
+		    (+ (focus-y gui) 1))))
+	((sdl2:scancode= scancode
+			 :scancode-left)
+	 (setf (focus-x gui)
+	       (max 0
+		    (- (focus-x gui) 1))))
+	((sdl2:scancode= scancode
+			 :scancode-right)
+	 (setf (focus-x gui)
+	       (min (- (columns gui) 1)
+		    (+ (focus-x gui) 1))))))
