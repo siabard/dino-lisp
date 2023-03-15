@@ -342,6 +342,8 @@
 (defmethod render-gui ((gui choice-dialog) renderer)
   (let* ((origin-x  (x gui))
 	 (origin-y  (y gui))
+	 (spacing-x (spacing-x gui))
+	 (spacing-y (spacing-y gui))
 	 (focus-x   (focus-x gui))
 	 (focus-y   (focus-y gui))
 	 (display-start (display-start gui))
@@ -364,14 +366,15 @@
 			  (= pos-y focus-y))
 		 (sprite/set-dest-rect cursor (sdl2:make-rect
 					       (+ origin-x (* pos-x
-							      (+ cursor-width item-width)))
-					       (+ origin-y (* pos-y item-height))
+							      (+ cursor-width item-width spacing-x)))
+					       (+ origin-y (* pos-y (+  item-height spacing-y)))
 					       cursor-width
 					       cursor-height))
 		 (sprite/set-source-rect cursor (sdl2:make-rect 0 0 cursor-width cursor-height))
 		 (sprite/render cursor renderer))
-	       (let* ((dest-x (+ origin-x cursor-width (* pos-x (+ cursor-width item-width))))
-		      (dest-y (+ origin-y (* pos-y item-height))))
+	       (let* ((dest-x (+ origin-x cursor-width
+				 (* pos-x (+ cursor-width item-width spacing-x))))
+		      (dest-y (+ origin-y (* pos-y (+  item-height spacing-y)))))
 		 (set-pos-gui item dest-x dest-y)
 		 (render-gui item renderer))
 	       (incf pos-x)))))
