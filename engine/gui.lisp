@@ -147,11 +147,14 @@
    (content :initarg :content
 	    :accessor content)))
 
+(defun make-label (x y text)
+  (make-instance 'label :x x :y y :content text))
+
 (defmethod render-gui ((gui label) renderer)
   (draw-string renderer
 	       (x gui)
 	       (y gui)
-	       (list  (content gui))))
+	       (content gui)))
 ;; dialog window
 ;; 이제는 그럼 texts 자체를 chunk로 만들어서 가지고 다니도록 하자.
 
@@ -303,6 +306,7 @@
 				 item-height
 				 texture
 				 atlas
+				 cursor
 				 (columns 1)
 				 (focus-x 0)
 				 (focus-y 0)
@@ -321,8 +325,10 @@
     (make-instance 'choice-dialog
 		   :x x :y y
 		   :item-width item-width :item-height item-height
+		   :datasource datasource
 		   :focus-x focus-x :focus-y focus-y
 		   :spacing-x spacing-x :spacing-y spacing-y
+		   :cursor cursor
 		   :show-cursor-p show-cursor-p
 		   :max-rows max-rows
 		   :columns columns
@@ -339,7 +345,7 @@
 	 (focus-x   (focus-x gui))
 	 (focus-y   (focus-y gui))
 	 (display-start (display-start gui))
-	 (display-end (+ display-start (* (display-rows gui))))
+	 (display-end (- (+ display-start (* (display-rows gui))) 1))
 	 (cursor      (cursor gui))
 	 (cursor-width (sdl2:texture-width (sprite-texture cursor)))
 	 (cursor-height (sdl2:texture-height (sprite-texture cursor)))

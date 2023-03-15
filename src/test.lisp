@@ -124,3 +124,42 @@
 		   (sdl2-ffi.functions:sdl-stop-text-input)
 		   (delete-global-texture)
 		   t)))))))
+
+
+(defun test/choice-select ()
+   (sdl2:with-init (:everything)
+    (sdl2:with-window (win :title "text input" :w 640 :h 480)
+      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	(let* ((label-1 (make-label 0 0 "레이블 1"))
+	       (label-2 (make-label 0 0 "레이블 2"))
+	       (label-3 (make-label 0 0 "레이블 3"))
+	       (label-4 (make-label 0 0 "레이블 4"))
+	       (cursor-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
+	       (dialog (make-choice-dialog 50 50
+					   :datasource (list label-1 label-2 label-3 label-4)
+					   :item-width 80
+					   :item-height 16
+					   :cursor (make-sprite :texture cursor-texture
+								:source-rect (sdl2:make-rect 0 0 9 9)
+								:dest-rect (sdl2:make-rect 0 0 9 9))
+					   :display-start 0
+					   :display-rows 3)))
+	  (init-font "ascii"  "assets/ascii.png")
+	  (init-font "hangul" "assets/hangul.png")
+	  (sdl2:with-event-loop (:method :poll)
+	    (:mousebuttondown ()
+			      )
+	    (:idle ()
+		   (sdl2:set-render-draw-color renderer 0 0 0 255)
+		   (sdl2:render-clear renderer)
+		   (sdl2:set-render-draw-color renderer 255 255 255 255)
+
+		   (render-gui dialog renderer)
+
+
+		   (sdl2:render-present renderer)
+		   (sdl2:delay 40))
+	    (:quit ()
+		   (sdl2-ffi.functions:sdl-stop-text-input)
+		   (delete-global-texture)
+		   t)))))))
