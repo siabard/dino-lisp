@@ -221,10 +221,10 @@
   (:documentation "render dialog window"))
 
 (defmethod render-dialog-window (dialog-window &key renderer)
-  (let* ((x (x dialog-window))
-	 (y (y dialog-window))
-	 (w (w dialog-window))
-	 (h (h dialog-window))
+  (let* ((x (+ 0 (x dialog-window)))
+	 (y (+ 0 (y dialog-window)))
+	 (w (+ 0 (w dialog-window)))
+	 (h (+ 0 (h dialog-window)))
 	 (title (title dialog-window))
 	 (texts (texts dialog-window))
 	 (current-texts (elt texts (index dialog-window))))
@@ -347,7 +347,7 @@
 	 (focus-x   (focus-x gui))
 	 (focus-y   (focus-y gui))
 	 (display-start (display-start gui))
-	 (display-end (- (+ display-start (* (display-rows gui))) 1))
+	 (display-end (- (+ display-start (* (display-rows gui) (columns gui))) 1))
 	 (cursor      (cursor gui))
 	 (cursor-width (sdl2:texture-width (sprite-texture cursor)))
 	 (cursor-height (sdl2:texture-height (sprite-texture cursor)))
@@ -380,8 +380,11 @@
 	       (incf pos-x)))))
 
 
+;; 셀렉트 상하 이동
+(defun choice/move-up (choice)
+  )
 
-;; 키 인풋등
+;; 키 입력처리
 (defgeneric process-key-event (gui scancode)
   (:documentation "key event 처리"))
 
@@ -394,8 +397,7 @@
 	((sdl2:scancode= scancode
 			 :scancode-down)
 	 (setf (focus-y gui)
-	       (min (round (- (/ (display-rows gui)
-				  (columns gui)) 1))
+	       (min (- (display-rows gui) 1)
 		    (+ (focus-y gui) 1))))
 	((sdl2:scancode= scancode
 			 :scancode-left)

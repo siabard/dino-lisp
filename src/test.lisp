@@ -144,7 +144,7 @@
 								:dest-rect (sdl2:make-rect 0 0 9 9))
 					   :columns 2
 					   :display-start 0
-					   :display-rows 4)))
+					   :display-rows 2)))
 	  (init-font "ascii"  "assets/ascii.png")
 	  (init-font "hangul" "assets/hangul.png")
 	  (sdl2:with-event-loop (:method :poll)
