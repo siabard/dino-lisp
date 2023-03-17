@@ -346,8 +346,12 @@
 	 (spacing-y (spacing-y gui))
 	 (focus-x   (focus-x gui))
 	 (focus-y   (focus-y gui))
+	 (max-end   (- (length (datasource gui)) 1))
 	 (display-start (display-start gui))
 	 (display-end (- (+ display-start (* (display-rows gui) (columns gui))) 1))
+	 (display-end (cond ((> display-end max-end)
+			     max-end)
+			    (t display-end)))
 	 (cursor      (cursor gui))
 	 (cursor-width (sdl2:texture-width (sprite-texture cursor)))
 	 (cursor-height (sdl2:texture-height (sprite-texture cursor)))
@@ -382,7 +386,55 @@
 
 ;; 셀렉트 상하 이동
 (defun choice/move-up (choice)
-  )
+  (let* ((focus-y (focus-y choice))
+	 (columns (columns choice))
+	 (display-start (display-start choice)))
+    (cond ((> focus-y 0)
+	   (setf (focus-y choice) (- focus-y 1)))
+	  (t
+	   (when (<= columns display-start)
+	     (setf (display-start choice) (- display-start columns)))))))
+
+(defun choice/move-down (choice)
+  (let* ((focus-y (focus-y choice))
+	 (display-rows (display-rows choice))
+	 (display-start (display-start choice))
+	 (columns (columns choice))
+	 (datasource (datasource choice))
+	 (next-display-start (+ display-start columns))
+	 (next-display-end (- (+ next-display-start (* display-rows columns)) 1))
+	 (next-rows (ceiling (/ (+  next-display-end 1) columns)))
+	 (total-rows (ceiling (/  (length datasource) columns))))
+    (cond ((< focus-y (-  display-rows 1))
+	   (setf (focus-y choice) (+ focus-y 1)))
+	  (t
+	   (when (<= next-rows total-rows)
+	     (setf (display-start choice) next-display-start))))))
+
+(defun choice/move-left (choice)
+  (let* ((focus-x (focus-x choice)))
+    (cond ((> focus-x 0)
+	   (setf (focus-x choice) (- focus-x 1))))))
+
+(defun choice/current-index (choice)
+  (let* ((focus-x (focus-x choice))
+	 (focus-y (focus-y choice))
+	 (display-start (display-start choice))
+	 (columns (columns choice)))
+    (+ display-start focus-x (* focus-y columns))))
+
+
+(defun choice/move-right (choice)
+  (let* ((focus-x (focus-x choice))
+	 (current-index (choice/current-index choice))
+	 (max-index (-  (length (datasource choice)) 1))
+	 (columns (columns choice)))
+    (when (and
+	   (< focus-x (- columns 1))
+	   (> max-index current-index))
+      (setf (focus-x choice) (+ focus-x 1)))))
+
+
 
 ;; 키 입력처리
 (defgeneric process-key-event (gui scancode)
@@ -391,21 +443,13 @@
 (defmethod process-key-event ((gui choice-dialog) scancode)
   (cond ((sdl2:scancode= scancode
 			 :scancode-up)
-	 (setf (focus-y gui)
-	       (max 0
-		    (- (focus-y gui) 1))))
+	 (choice/move-up gui))
 	((sdl2:scancode= scancode
 			 :scancode-down)
-	 (setf (focus-y gui)
-	       (min (- (display-rows gui) 1)
-		    (+ (focus-y gui) 1))))
+	 (choice/move-down gui))
 	((sdl2:scancode= scancode
 			 :scancode-left)
-	 (setf (focus-x gui)
-	       (max 0
-		    (- (focus-x gui) 1))))
+	 (choice/move-left gui))
 	((sdl2:scancode= scancode
 			 :scancode-right)
-	 (setf (focus-x gui)
-	       (min (- (columns gui) 1)
-		    (+ (focus-x gui) 1))))))
+	 (choice/move-right gui))))

@@ -134,9 +134,13 @@
 	       (label-2 (make-label 0 0 "레이블 2"))
 	       (label-3 (make-label 0 0 "레이블 3"))
 	       (label-4 (make-label 0 0 "레이블 4"))
+	       (label-5 (make-label 0 0 "레이블 5"))
+	       (label-6 (make-label 0 0 "레이블 6"))
+	       (label-7 (make-label 0 0 "레이블 7"))
+	       ;;(label-8 (make-label 0 0 "레이블 8"))
 	       (cursor-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
 	       (dialog (make-choice-dialog 50 50
-					   :datasource (list label-1 label-2 label-3 label-4)
+					   :datasource (list label-1 label-2 label-3 label-4 label-5 label-6 label-7 )
 					   :item-width 80
 					   :item-height 16
 					   :cursor (make-sprite :texture cursor-texture
