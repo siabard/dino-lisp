@@ -104,7 +104,7 @@
 ;; textbox 는 Panel + Text의 조합이다.
 ;; Text는 Panel 과 일정한 크기의 여백을 가진다.
 
-(defstruct textbox text font textscale textpanel textbounds texttexture)
+(defstruct textbox atlas choice title text font textscale textpanel textbounds texttexture)
 
 (defun textbox/set-text (textbox renderer text)
   (let* ((font (textbox-font textbox))
@@ -130,6 +130,11 @@
 (defgeneric render-gui (gui renderer)
   (:documentation "rendering gui"))
 
+(defgeneric render-width (gui)
+  (:documentation "rendering width"))
+
+(defgeneric render-height (gui)
+  (:documentation "rendering height"))
 
 (defgeneric set-pos-gui (gui new-x new-y)
   (:documentation "set x, y position"))
@@ -155,6 +160,14 @@
 	       (x gui)
 	       (y gui)
 	       (content gui)))
+
+(defmethod render-width ((gui label))
+  (let ((content (content gui)))
+    (* 16 (length content))))
+
+(defmethod render-height ((gui label))
+  16)
+
 ;; dialog window
 ;; 이제는 그럼 texts 자체를 chunk로 만들어서 가지고 다니도록 하자.
 
@@ -316,7 +329,7 @@
 				 rows
 				 (display-start 0)
 				 display-rows
-				 (on-selection (lambda () ))
+				 (on-selection (lambda (x) nil))
 				 (render-choice-item (lambda () )))
   (let* ((max-rows (cond (rows rows)
 			 (t (length datasource))))
@@ -358,7 +371,8 @@
 	 (item-width  (item-width gui))
 	 (item-height (item-height gui))
 	 (pos-x 0)
-	 (pos-y 0))
+	 (pos-y 0)
+	 (show-cursor-p (show-cursor-p gui)))
     (loop for item-index from display-start to display-end
 	  do (let* ((item (elt (datasource gui) item-index))
 		    (pos (- item-index display-start)))
@@ -366,7 +380,8 @@
 			  (= 0 (rem pos (columns gui))))
 		 (setf pos-x 0)
 		 (incf pos-y))
-	       (when (and (= pos-x focus-x)
+	       (when (and show-cursor-p
+			  (= pos-x focus-x)
 			  (= pos-y focus-y))
 		 (sprite/set-dest-rect cursor (sdl2:make-rect
 					       (+ origin-x (* pos-x
@@ -436,6 +451,18 @@
 
 
 
+(defun choice/get-index (choice)
+  (let ((focus-x (focus-x choice))
+	(focus-y (focus-y choice))
+	(columns (columns choice)))
+    (+ focus-x (* focus-y columns))))
+
+(defun choice/on-click (choice)
+  (let ((index (choice/get-index choice))
+	(on-selection (on-selection choice))
+	(datasource (datasource choice)))
+    (funcall on-selection (elt datasource index))))
+
 ;; 키 입력처리
 (defgeneric process-key-event (gui scancode)
   (:documentation "key event 처리"))
@@ -452,4 +479,34 @@
 	 (choice/move-left gui))
 	((sdl2:scancode= scancode
 			 :scancode-right)
-	 (choice/move-right gui))))
+	 (choice/move-right gui))
+	((sdl2:scancode= scancode
+			 :scancode-space)
+	 (choice/on-click gui))))
+
+(defmethod render-height ((gui choice-dialog))
+  (let ((spacing-y (spacing-y gui))
+	(display-rows (display-rows gui)))
+    (* spacing-y display-rows)))
+
+
+(defmethod render-width ((gui choice-dialog))
+  (let* ((datasource (datasource gui))
+	 (datasource-length (mapcar (lambda (item) (render-width item)) datasource)))
+    (apply #'max datasource-length)))
+
+
+(defun choice/percentage-shown (choice)
+  (let ((display-rows (display-rows choice))
+	(max-rows (max-rows choice)))
+    (/ display-rows max-rows)))
+
+(defun choice/percentage-scrolled (choice)
+  (let* ((max-rows (max-rows choice))
+	 (focus-y (focus-y choice))
+	 (current-percent (/ focus-y max-rows)))
+    current-percent))
+
+
+(defun choice/selected-item (choice)
+  (elt (datasource choice) (choice/get-index choice)))
