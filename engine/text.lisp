@@ -2,7 +2,7 @@
 
 ;;;; porting from https://github.com/Samuel85/SDL_DrawText.git
 ;;;; original code is c++
-
+;;;; draw ttf font
 (defun text/render-text (renderer font glyphs char x y width height)
   (let ((target-x x)
 	(target-y y)

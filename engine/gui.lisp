@@ -17,7 +17,7 @@
 		 :tween (make-tween
 			 :start 0
 			 :end 1
-			 :timespan 50
+			 :timespan 150
 			 :current-time 0
 			 :running t)))
 	 (atlas (make-tile-atlas texture width height)))
@@ -112,6 +112,9 @@
 	 (texture (sdl2:create-texture-from-surface renderer texture-surface)))
     (setf (textbox-texttexture textbox) texture)))
 
+(defun textbox/update (textbox dt)
+  (panel/update (textbox-textpanel textbox) dt))
+
 (defun textbox/render (textbox renderer x y w h)
   (let* ((panel (textbox-textpanel textbox)))
     (panel/render panel renderer x y w h)
@@ -126,6 +129,9 @@
 
 ;; gui
 (defclass gui () ())
+
+(defgeneric update-gui (gui dt)
+  (:documentation "update gui with when elapsed dt"))
 
 (defgeneric render-gui (gui renderer)
   (:documentation "rendering gui"))
@@ -179,6 +185,8 @@
 				  :accessor w)
 			       (h :initarg :h
 				  :accessor h)
+			       (panel :initarg :panel
+				      :accessor panel)
 			       (index :initarg :index
 				      :accessor index)
 			       (title :initarg :title
@@ -191,7 +199,7 @@
 ;;;; 생성자
 ;;; title 이 있으면... height가 20 (16 + margin 4) 만큼
 ;;; title 을 출력할 공간을 확보한다.
-(defun make-dialog-window (x y w h &key title texts)
+(defun make-dialog-window (x y w h &key title texts panel)
   (let* ((chunked-texts (chunk-text texts w h))
 	 (texts-length (length chunked-texts))
 	 (first-para (car chunked-texts))
@@ -204,10 +212,16 @@
 			     (+ 16 (* (length first-para) 16)))
 			    (t (+ 36 (* (length first-para) 16))))
 		   :index 0
+		   :panel panel
 		   :title title
 		   :texts-length texts-length
 		   :texts chunked-texts)))
 
+
+;;; update gui
+
+(defmethod update-gui ((gui dialog-window) dt)
+  (panel/update (panel gui) dt))
 
 ;;; dialog 내용 바꾸기
 (defgeneric set-dialog-window-texts (dialog-window texts w h)
@@ -240,12 +254,11 @@
 	 (h (+ 0 (h dialog-window)))
 	 (title (title dialog-window))
 	 (texts (texts dialog-window))
-	 (current-texts (elt texts (index dialog-window))))
-    ;; 외곽선 긋기
-    (sdl2:set-render-draw-color renderer 0 0 0 255)
-    (sdl2:render-fill-rect renderer (sdl2:make-rect x y w h))
-    (sdl2:set-render-draw-color renderer 255 255 255 255)
-    (sdl2:render-draw-rect renderer (sdl2:make-rect (+ x 4) (+ y 4) (- w 8) (- h 8)))
+	 (current-texts (elt texts (index dialog-window)))
+	 (panel (panel dialog-window))
+	 (panel-tween-end (tween/end-p (panel-struct-tween (panel dialog-window)))))
+    ;; 배경 패널 그리기
+    (panel/render panel renderer x y w h)
     ;; 타이틀 있으면 타이틀 쓰기
     (when title
       (draw-string renderer (+ x 8) (+ y 8) title))

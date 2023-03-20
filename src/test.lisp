@@ -28,19 +28,29 @@
     (sdl2:with-window (win :title "Gradient Box" :w 800 :h 600)
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(sdl2-image:init '(:jpg :png))
-	(let* ((panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*))))
-
+	(sdl2-ttf:init)
+	(let* ((font-10 (sdl2-ttf:open-font (uiop:merge-pathnames* "assets/notokr-regular.ttf" *application-root*) 14))
+	       (panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
+	       (text-panel (make-textbox :text '("테스트")
+					 :font font-10
+					 :textpanel (panel/setup panel-texture 3 3)))
+	       (current-time (sdl2:get-ticks)))
+	  (textbox/set-text text-panel renderer "테스트")
 	  (sdl2:with-event-loop (:method :poll)
 	    (:idle ()
-		   (sdl2:render-clear renderer)
+		   (let* ((dt (- (sdl2:get-ticks) current-time)))
+		     (sdl2:render-clear renderer)
 
-		   (sdl2:render-present renderer)
-		   (sdl2:delay 40)
-		   )
-	    )
+		     (textbox/update text-panel dt)
+		     (textbox/render text-panel renderer 20 20 150 150)
+		     (sdl2:render-present renderer)
+		     (setf current-time (sdl2:get-ticks))
+		     (sdl2:delay 40)))
+	    (:quit ()
+		   t))
+	  (sdl2-ttf:quit)
 	  (sdl2:destroy-texture panel-texture)
-	  )
-	))))
+	  )))))
 
 
 (defparameter *ttt* nil)
@@ -100,6 +110,7 @@
 	       (test-dialog (make-dialog-window 90 100
 						12 4
 						:title "테스트"
+						:panel ()
 						:texts long-texts)))
 	  (init-font "ascii"  "assets/ascii.png")
 	  (init-font "hangul" "assets/hangul.png")
