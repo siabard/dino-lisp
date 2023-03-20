@@ -97,7 +97,7 @@
 	    (:quit ()
 		   (sdl2-ffi.functions:sdl-stop-text-input)
 		   (delete-global-texture)
-		   t)))))))
+		   t))))))))
 
 
 (defun test/dialog-test ()
@@ -107,10 +107,14 @@
 	(let* ((long-texts '("이 글은 정말 긴 글입니다. 그래서 중간이 잘려야하죠."
 			     "물론 이런 정책이 늘 있는 것은 아니지만 캐릭터간의 대화는 당연히 잘려야하지 않을가요?"))
 	       (panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
+	       (char-texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root*)))
 	       (test-dialog (make-dialog-window 90 100
 						12 4
 						:title "테스트"
 						:panel (panel/setup panel-texture 3 3)
+						:avatar (make-sprite :texture char-texture
+								     :source-rect (sdl2:make-rect 0 0 16 16)
+								     :dest-rect (sdl2:make-rect 90 100 16 16))
 						:texts long-texts))
 	       (current-time (sdl2:get-ticks)))
 	  (init-font "ascii"  "assets/ascii.png")
@@ -134,9 +138,11 @@
 
 		     (sdl2:render-present renderer)
 		     (setf current-time (sdl2:get-ticks))
-		     (sdl2:delay 40)))
+		     (sdl2:delay 25)))
 	    (:quit ()
 		   (sdl2-ffi.functions:sdl-stop-text-input)
+		   (sdl2:destroy-texture panel-texture)
+		   (sdl2:destroy-texture char-texture)
 		   (delete-global-texture)
 		   t)))))))
 

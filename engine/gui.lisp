@@ -194,12 +194,16 @@
 			       (texts-length :initarg :texts-length
 					     :accessor texts-length)
 			       (texts :initarg :texts
-				      :accessor texts)))
+				      :accessor texts)
+			       (avatar :initarg :avatar
+				       :accessor avatar)
+			       (choice :initarg :choice
+				       :accessor choice)))
 
 ;;;; 생성자
 ;;; title 이 있으면... height가 20 (16 + margin 4) 만큼
 ;;; title 을 출력할 공간을 확보한다.
-(defun make-dialog-window (x y w h &key title texts panel)
+(defun make-dialog-window (x y w h &key title texts panel avatar choice)
   (let* ((chunked-texts (chunk-text texts w h))
 	 (texts-length (length chunked-texts))
 	 (first-para (car chunked-texts))
@@ -214,6 +218,8 @@
 		   :index 0
 		   :panel panel
 		   :title title
+		   :avatar avatar
+		   :choice choice
 		   :texts-length texts-length
 		   :texts chunked-texts)))
 
@@ -228,10 +234,14 @@
   (:documentation "내용을 바꾸면서 w, h 도 같이 변경 "))
 
 
-(defmethod set-dialog-window-texts (dialog-window texts w h)
-  (let* ((chunked-texts (chunk-text texts w h))
+(defmethod set-dialog-window-texts (dialog-window texts words lines)
+  (let* ((chunked-texts (chunk-text texts words lines))
 	 (texts-length (length chunked-texts))
 	 (full-length (apply #'max 0 (mapcar #'length (car chunked-texts))))
+	 (avatar (avatar dialog-window))
+	 (avatar-width (sdl2:rect-width (sprite-dest-rect avatar)))
+	 (avatar-height (sdl2:rect-height (sprite-dest-rect avatar)))
+	 (choice (choice dialog-window))
 	 (title (title dialog-window)))
     (when (> (* 16 full-length) (- (w dialog-window) 16))
       (setf (w dialog-window) (+ 16 (* 16 full-length))))
@@ -239,6 +249,17 @@
       (setf (h dialog-window)
 	    (cond ((eq title nil) (+ 16 (* 16 (length texts))))
 		  (t (+ 36 (* 16 (length texts)))))))
+    (when avatar
+      (setf (w dialog-window)
+	    (+ (w dialog-window)
+	       avatar-width))
+      (setf (h dialog-window)
+	   (max (h dialog-window)
+		avatar-height)))
+    (when choice
+      (setf (h dialog-window)
+	    (+ (h dialog-window)
+	       (render-height choice))))
     (setf (index dialog-window) 0)
     (setf (texts dialog-window) chunked-texts)
     (setf (texts-length dialog-window) texts-length)))
@@ -255,6 +276,8 @@
 	 (title (title dialog-window))
 	 (texts (texts dialog-window))
 	 (current-texts (elt texts (index dialog-window)))
+	 (avatar (avatar dialog-window))
+	 (avatar-width (sdl2:rect-width (sprite-dest-rect avatar)))
 	 (panel (panel dialog-window))
 	 (panel-tween-end (tween/end-p (panel-struct-tween (panel dialog-window)))))
     ;; 배경 패널 그리기
@@ -262,11 +285,17 @@
     ;; 타이틀 있으면 타이틀 쓰기
     (when panel-tween-end
       (when title
-	(draw-string renderer (+ x 8) (+ y 8) title))
+	(draw-string renderer (+ x (cond ((eq nil (avatar dialog-window)) 8)
+					 (t avatar-width)))
+		     (+ y 8) title))
+      ;; 아바타 출력하기
+      (sprite/render avatar renderer)
       ;; 내용 쓰기
       (dolist (text current-texts)
 	(draw-string renderer
-		     (+ x 8)
+		     (+ x
+			(cond ((eq nil (avatar dialog-window)) 8)
+			      (t avatar-width)))
 		     (+ y
 			(cond ((eq nil title) 8)
 			      (t 28)))

@@ -22,3 +22,8 @@ build:
 		--load $(PROJECT).asd \
 		--eval '(ql:quickload "$(PROJECT)")' \
 		--eval '(asdf:make :dino-lisp)'
+
+latest:
+	$(LISP) --non-interactive \
+		--eval '(ql:quickload "$(PROJECT)")' \
+		--eval "(sb-ext:save-lisp-and-die #p\"target/core_latest\" :executable t)"
