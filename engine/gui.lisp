@@ -60,7 +60,7 @@
 		  (tweened-width  (floor  (* w tween-factor)))
 		  (tweened-height (floor  (* h tween-factor)))
 		  (tweened-x      (floor  (- center-x (* tween-factor (/ w 2)))))
-		  (tweened-y      (floor  (- center-y (* tween-factor  (/ w 2))))))
+		  (tweened-y      (floor  (- center-y (* tween-factor  (/ h 2))))))
 	     (values tweened-x tweened-y tweened-width tweened-height)))
 	  (t (values x y w h)))))
 
@@ -81,7 +81,7 @@
 	   (panel-height      (panel-struct-atlas-height panel))
 	   (panel-width-span  (- w (* 2 panel-width)))
 	   (panel-height-span (- h (* 2 panel-height))))
-      (when (and (> panel-width-span 0) (> panel-height-span))
+      (when (and (> panel-width-span 0) (> panel-height-span 0))
 	(panel/draw-partial renderer panel-texture panel-top-left (sdl2:make-rect x y panel-width panel-height))
 	(panel/draw-partial renderer panel-texture panel-top-mid  (sdl2:make-rect (+  x panel-width) y panel-width-span panel-height))
 	(panel/draw-partial renderer panel-texture panel-top-right (sdl2:make-rect (+  x panel-width panel-width-span) y panel-width panel-height))
@@ -260,17 +260,21 @@
     ;; 배경 패널 그리기
     (panel/render panel renderer x y w h)
     ;; 타이틀 있으면 타이틀 쓰기
-    (when title
-      (draw-string renderer (+ x 8) (+ y 8) title))
-    ;; 내용 쓰기
-    (dolist (text current-texts)
-      (draw-string renderer
-		   (+ x 8)
-		   (+ y
-		      (cond ((eq nil title) 8)
-			    (t 28)))
-		   text)
-      (incf y 16))))
+    (when panel-tween-end
+      (when title
+	(draw-string renderer (+ x 8) (+ y 8) title))
+      ;; 내용 쓰기
+      (dolist (text current-texts)
+	(draw-string renderer
+		     (+ x 8)
+		     (+ y
+			(cond ((eq nil title) 8)
+			      (t 28)))
+		     text)
+	(incf y 16)))))
+
+(defmethod update-gui ((gui dialog-window) dt)
+  (panel/update (panel gui) dt))
 
 (defmethod render-gui ((gui dialog-window) renderer)
   (render-dialog-window gui :renderer renderer))

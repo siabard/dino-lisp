@@ -94,7 +94,6 @@
 						     (concatenate 'string a b))
 						   input-text))))
 		   (sdl2:render-present renderer)
-		   (sdl2:delay 40))
 	    (:quit ()
 		   (sdl2-ffi.functions:sdl-stop-text-input)
 		   (delete-global-texture)
@@ -107,11 +106,13 @@
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(let* ((long-texts '("이 글은 정말 긴 글입니다. 그래서 중간이 잘려야하죠."
 			     "물론 이런 정책이 늘 있는 것은 아니지만 캐릭터간의 대화는 당연히 잘려야하지 않을가요?"))
+	       (panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
 	       (test-dialog (make-dialog-window 90 100
 						12 4
 						:title "테스트"
-						:panel ()
-						:texts long-texts)))
+						:panel (panel/setup panel-texture 3 3)
+						:texts long-texts))
+	       (current-time (sdl2:get-ticks)))
 	  (init-font "ascii"  "assets/ascii.png")
 	  (init-font "hangul" "assets/hangul.png")
 
@@ -123,14 +124,17 @@
 								(- (length (texts dialog)) 1))
 							 (incf (index dialog))))))
 	    (:idle ()
-		   (sdl2:set-render-draw-color renderer 0 0 0 255)
-		   (sdl2:render-clear renderer)
-		   (sdl2:set-render-draw-color renderer 255 255 255 255)
+		   (let* ((dt (- (sdl2:get-ticks) current-time)))
+		     (sdl2:set-render-draw-color renderer 0 0 0 255)
+		     (sdl2:render-clear renderer)
+		     (sdl2:set-render-draw-color renderer 255 255 255 255)
 
-		   (render-dialog-window test-dialog :renderer renderer)
+		     (update-gui test-dialog dt)
+		     (render-dialog-window test-dialog :renderer renderer)
 
-		   (sdl2:render-present renderer)
-		   (sdl2:delay 40))
+		     (sdl2:render-present renderer)
+		     (setf current-time (sdl2:get-ticks))
+		     (sdl2:delay 40)))
 	    (:quit ()
 		   (sdl2-ffi.functions:sdl-stop-text-input)
 		   (delete-global-texture)
@@ -181,3 +185,35 @@
 		   (sdl2-ffi.functions:sdl-stop-text-input)
 		   (delete-global-texture)
 		   t)))))))
+
+
+
+
+(defun bitmap-test-main ()
+  (sdl2:with-init (:video)
+    (sdl2:with-window (win :title "bitmap font" :flags '(:shown) :w 800 :h 600)
+      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	(init-font "ascii"  "assets/ascii.png")
+	(init-font "hangul" "assets/hangul.png")
+	(let ((textbox (make-dialog-window 40
+					   60
+					   12
+					   4
+					   :title "제목"
+					   :texts '("Hello World"
+						    "안녕하세요."
+						    "숫자 1234 number"))))
+	  (sdl2:with-event-loop (:method :poll)
+	    (:quit ()
+		   (format t "END")
+		   t)
+	    (:idle ()
+
+		   (sdl2:set-render-draw-color renderer 0 0 0 255 )
+		   (sdl2:render-clear renderer)
+
+		   (render-dialog-window textbox :renderer renderer)
+
+		   (sdl2:render-present renderer)
+		   (sdl2:delay 16)))))
+      (delete-global-texture))))

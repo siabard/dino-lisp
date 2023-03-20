@@ -240,32 +240,3 @@
 
 (defun delete-global-image ()
   (clrhash *loaded-images*))
-
-(defun bitmap-test-main ()
-  (sdl2:with-init (:video)
-    (sdl2:with-window (win :title "bitmap font" :flags '(:shown) :w 800 :h 600)
-      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
-	(init-font "ascii"  "assets/ascii.png")
-	(init-font "hangul" "assets/hangul.png")
-	(let ((textbox (make-dialog-window 40
-					   60
-					   12
-					   4
-					   :title "제목"
-					   :texts '("Hello World"
-						    "안녕하세요."
-						    "숫자 1234 number"))))
-	  (sdl2:with-event-loop (:method :poll)
-	    (:quit ()
-		   (format t "END")
-		   t)
-	    (:idle ()
-
-		   (sdl2:set-render-draw-color renderer 0 0 0 255 )
-		   (sdl2:render-clear renderer)
-
-		   (render-dialog-window textbox :renderer renderer)
-
-		   (sdl2:render-present renderer)
-		   (sdl2:delay 16)))))
-      (delete-global-texture))))
