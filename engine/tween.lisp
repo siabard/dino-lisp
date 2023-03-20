@@ -30,7 +30,7 @@
 	 (dt    (cond ((>= ratio 1) 1)
 		      (t ratio))))
     (cond ((tween-running tw)
-	   (- start (* change (- (sqrt (- 1 (* dt dt))) 1))))
+	   (+ start (* change (- 1 (sqrt (- 1 (* dt dt)))))))
 	  (t end))))
 
 ;; tween 종료?
