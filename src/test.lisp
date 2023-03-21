@@ -223,3 +223,38 @@
 		   (sdl2:render-present renderer)
 		   (sdl2:delay 16)))))
       (delete-global-texture))))
+
+
+(defun test/progress-bar ()
+   (sdl2:with-init (:everything)
+    (sdl2:with-window (win :title "progress-bar" :w 640 :h 480)
+      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	(let* ((bar-texture (load-texture renderer (uiop:merge-pathnames* "assets/progress_bar.png" *application-root*)))
+	       (hpbar (make-progress-bar bar-texture
+					 :x 100
+					 :y 100
+					 :w 80
+					 :h 20
+					 :atlas (make-tile-atlas bar-texture 2 2)
+					 :value 20
+					 :max-value 100))
+
+	       )
+	  (sdl2:with-event-loop (:method :poll)
+	    (:mousebuttondown ())
+	    (:keydown ())
+	    (:idle ()
+		   (sdl2:set-render-draw-color renderer 0 0 0 255)
+		   (sdl2:render-clear renderer)
+		   (sdl2:set-render-draw-color renderer 255 255 255 255)
+
+		   (render-gui hpbar renderer)
+
+
+		   (sdl2:render-present renderer)
+		   (sdl2:delay 40))
+	    (:quit ()
+		   (sdl2-ffi.functions:sdl-stop-text-input)
+		   (sdl2:destroy-texture bar-texture)
+		   (delete-global-texture)
+		   t)))))))
