@@ -48,4 +48,6 @@
 	       (:module "system"
 		:components ((:file "inventory")))
 	       (:module "states"
-		:components ((:file "state")))))
+		:components ((:file "state")))
+	       (:module "gui"
+		:components ((:file "progress_bar")))))

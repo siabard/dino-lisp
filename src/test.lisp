@@ -114,7 +114,7 @@
 						:panel (panel/setup panel-texture 3 3)
 						:avatar (make-sprite :texture char-texture
 								     :source-rect (sdl2:make-rect 0 0 16 16)
-								     :dest-rect (sdl2:make-rect 90 100 16 16))
+								     :dest-rect (sdl2:make-rect 94 104 16 16))
 						:texts long-texts))
 	       (current-time (sdl2:get-ticks)))
 	  (init-font "ascii"  "assets/ascii.png")

@@ -6,10 +6,8 @@
 ;;;; atlas는 source-rect 에 준하는 rect 형이므로
 ;;;; 적절한 셀만 넣는다면 큰 문제는 아님
 
-(defun make-tile-atlas (texture tile-width tile-height)
-  (let ((texture-height (sdl2:texture-height texture))
-	(texture-width  (sdl2:texture-width texture)))
-    (make-tile-atlas-raw texture-width texture-height tile-width tile-height)))
+(defun make-tile-atlas (texture tile-width tile-height &key (texture-height (sdl2:texture-height texture)) (texture-width (sdl2:texture-width texture)))
+  (make-tile-atlas-raw texture-width texture-height tile-width tile-height))
   
 (defun make-tile-atlas-raw (width height tile-width tile-height)
   (let ((tile-cols (floor width tile-width))
