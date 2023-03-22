@@ -258,3 +258,38 @@
 		   (sdl2:destroy-texture bar-texture)
 		   (delete-global-texture)
 		   t)))))))
+
+
+(defun test/scroll-bar ()
+   (sdl2:with-init (:everything)
+    (sdl2:with-window (win :title "scroll-bar" :w 640 :h 480)
+      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	(let* ((bar-texture (load-texture renderer (uiop:merge-pathnames* "assets/scrollbar.png" *application-root*)))
+	       (hpbar (make-scroll-bar bar-texture
+					 :x 100
+					 :y 100
+					 :w 18
+					 :h 120
+					 :atlas  (make-tile-atlas bar-texture 18 18)
+					 :value 20
+					 :max-value 100))
+
+	       )
+	  (sdl2:with-event-loop (:method :poll)
+	    (:mousebuttondown ())
+	    (:keydown ())
+	    (:idle ()
+		   (sdl2:set-render-draw-color renderer 0 0 0 255)
+		   (sdl2:render-clear renderer)
+		   (sdl2:set-render-draw-color renderer 255 255 255 255)
+
+		   (render-gui hpbar renderer)
+
+
+		   (sdl2:render-present renderer)
+		   (sdl2:delay 40))
+	    (:quit ()
+		   (sdl2-ffi.functions:sdl-stop-text-input)
+		   (sdl2:destroy-texture bar-texture)
+		   (delete-global-texture)
+		   t)))))))

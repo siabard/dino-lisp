@@ -50,4 +50,5 @@
 	       (:module "states"
 		:components ((:file "state")))
 	       (:module "gui"
-		:components ((:file "progress_bar")))))
+		:components ((:file "progress_bar")
+			     (:file "scroll_bar")))))
