@@ -80,7 +80,7 @@
 	  (sdl2-ffi.functions:sdl-start-text-input)
 	  (sdl2:with-event-loop (:method :poll)
 	    (:textinput (:text text)
-			(format t "\"~A\"~%" text)
+
 			(push text input-text))
 	    (:idle ()
 		   (sdl2:set-render-draw-color renderer 0 0 0 255)
@@ -333,7 +333,7 @@
 	  (sdl2:with-event-loop (:method :poll)
 	    (:idle ()
 		   (let* ((dt (- (sdl2:get-ticks) current-time)))
-		     (format t "~A~%" dt)
+
 		     (sdl2:set-render-draw-color renderer 0 0 0 255)
 		     (sdl2:render-clear renderer)
 		     (sdl2:set-render-draw-color renderer 255 255 255 255)
