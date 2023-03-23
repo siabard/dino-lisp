@@ -53,4 +53,8 @@
 		:components ((:file "progress_bar")
 			     (:file "scroll_bar")
 			     (:file "label")
+			     (:file "textbox")
+			     (:file "panel")
+			     (:file "dialog_window")
+			     (:file "choice_dialog")
 			     (:file "state_stack")))))
