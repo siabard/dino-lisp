@@ -149,30 +149,6 @@
   (setf (x gui) new-x)
   (setf (y gui) new-y))
 
-;; 일반 gui 텍스트 (label)
-(defclass label (gui)
-  ((x :initarg :x
-      :accessor x)
-   (y :initarg :y
-      :accessor y)
-   (content :initarg :content
-	    :accessor content)))
-
-(defun make-label (x y text)
-  (make-instance 'label :x x :y y :content text))
-
-(defmethod render-gui ((gui label) renderer)
-  (draw-string renderer
-	       (x gui)
-	       (y gui)
-	       (content gui)))
-
-(defmethod render-width ((gui label))
-  (let ((content (content gui)))
-    (* 16 (length content))))
-
-(defmethod render-height ((gui label))
-  16)
 
 ;; dialog window
 ;; 이제는 그럼 texts 자체를 chunk로 만들어서 가지고 다니도록 하자.
@@ -201,10 +177,12 @@
 				       :accessor choice)))
 
 ;;;; 생성자
-;;; title 이 있으면... height가 20 (16 + margin 4) 만큼
-;;; title 을 출력할 공간을 확보한다.
-(defun make-dialog-window (x y w h &key title texts panel avatar choice)
-  (let* ((chunked-texts (chunk-text texts w h))
+;; cols, rows 가 0 이라면 각각 가능한 전체 크기에 들어갈 수 있는 크기를 사용한다.
+;; (*logical-width* - x) / 16, (*logical-height* - y) / 16
+;; 일단 화면의 최대 크기를 이용한다. (global의 값 이용)
+;; cols ㅁㄴ
+(defun make-dialog-window (x y &key (cols (/ (- *logical-width* x) 16)) (rows (/ (- *logical-height* y) 16)) title texts panel avatar choice)
+  (let* ((chunked-texts (chunk-text texts cols rows))
 	 (texts-length (length chunked-texts))
 	 (first-para (car chunked-texts))
 	 (full-length (apply #'max 0 (mapcar #'length first-para))))
@@ -277,7 +255,8 @@
 	 (texts (texts dialog-window))
 	 (current-texts (elt texts (index dialog-window)))
 	 (avatar (avatar dialog-window))
-	 (avatar-width (sdl2:rect-width (sprite-dest-rect avatar)))
+	 (avatar-width (cond (avatar  (sdl2:rect-width (sprite-dest-rect avatar)))
+			     (t 0)))
 	 (panel (panel dialog-window))
 	 (panel-tween-end (tween/end-p (panel-struct-tween (panel dialog-window)))))
     ;; 배경 패널 그리기
@@ -289,7 +268,8 @@
 					 (t avatar-width)))
 		     (+ y 8) title))
       ;; 아바타 출력하기
-      (sprite/render avatar renderer)
+      (when avatar
+	(sprite/render avatar renderer))
       ;; 내용 쓰기
       (dolist (text current-texts)
 	(draw-string renderer

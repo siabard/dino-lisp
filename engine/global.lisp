@@ -23,6 +23,9 @@
 ;; dest-rect-width = texture-width * scale-x
 ;; dest-rect-height = texture-height * scale-y
 
+(defparameter *logical-width* 320)
+(defparameter *logical-height* 240)
+
 (defparameter *scale-x* 1)
 (defparameter *scale-y* 1)
 ;;;

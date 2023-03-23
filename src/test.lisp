@@ -109,7 +109,23 @@
 	       (panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
 	       (char-texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root*)))
 	       (test-dialog (make-dialog-window 90 100
-						12 4
+						:cols 12 :rows 4
+						:title "테스트"
+						:panel (panel/setup panel-texture 3 3)
+						:avatar (make-sprite :texture char-texture
+								     :source-rect (sdl2:make-rect 0 0 16 16)
+								     :dest-rect (sdl2:make-rect 94 104 16 16))
+						:texts long-texts))
+	       (test-dialog2 (make-dialog-window 90 300
+						:cols 12 :rows 4
+						:title "테스트"
+						:panel (panel/setup panel-texture 3 3)
+						:avatar (make-sprite :texture char-texture
+								     :source-rect (sdl2:make-rect 0 0 16 16)
+								     :dest-rect (sdl2:make-rect 94 104 16 16))
+						:texts long-texts))
+	       (test-dialog3 (make-dialog-window 290 300
+						:cols 12 :rows 4
 						:title "테스트"
 						:panel (panel/setup panel-texture 3 3)
 						:avatar (make-sprite :texture char-texture
@@ -117,8 +133,8 @@
 								     :dest-rect (sdl2:make-rect 94 104 16 16))
 						:texts long-texts))
 	       (current-time (sdl2:get-ticks)))
-	  (init-font "ascii"  "assets/ascii.png")
-	  (init-font "hangul" "assets/hangul.png")
+	  (init-font "ascii"  (uiop:merge-pathnames* "assets/ascii.png" *application-root*))
+	  (init-font "hangul" (uiop:merge-pathnames* "assets/hangul.png" *application-root*))
 
 	  (sdl2:with-event-loop (:method :poll)
 	    (:mousebuttondown ()
@@ -134,7 +150,12 @@
 		     (sdl2:set-render-draw-color renderer 255 255 255 255)
 
 		     (update-gui test-dialog dt)
+		     (update-gui test-dialog2 dt)
+		     (update-gui test-dialog3 dt)
+
 		     (render-dialog-window test-dialog :renderer renderer)
+		     (render-dialog-window test-dialog2 :renderer renderer)
+		     (render-dialog-window test-dialog3 :renderer renderer)
 
 		     (sdl2:render-present renderer)
 		     (setf current-time (sdl2:get-ticks))
@@ -203,8 +224,8 @@
 	(init-font "hangul" "assets/hangul.png")
 	(let ((textbox (make-dialog-window 40
 					   60
-					   12
-					   4
+					   :cols 12
+					   :rows 4
 					   :title "제목"
 					   :texts '("Hello World"
 						    "안녕하세요."
@@ -291,5 +312,42 @@
 	    (:quit ()
 		   (sdl2-ffi.functions:sdl-stop-text-input)
 		   (sdl2:destroy-texture bar-texture)
+		   (delete-global-texture)
+		   t)))))))
+
+(defun test/stack-state ()
+   (sdl2:with-init (:everything)
+    (sdl2:with-window (win :title "scroll-bar" :w 640 :h 480)
+      (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
+	(let* ((panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
+	       (panel1 (panel/setup panel-texture 3 3))
+	       (panel2 (panel/setup panel-texture 3 3))
+	       (panel3 (panel/setup panel-texture 3 3))
+	       (state_stack (make-state-stack))
+	       (current-time (sdl2:get-ticks)))
+	  (init-font "ascii"  (uiop:merge-pathnames* "assets/ascii.png" *application-root*))
+	  (init-font "hangul" (uiop:merge-pathnames* "assets/hangul.png" *application-root*))
+	  (add-fixed state_stack 50 60 "안녕하세요" :w 200 :h 150 :panel panel1)
+	  (add-fixed state_stack 55 65 "반가와요" :w 200 :h 150 :panel panel2)
+	  (add-fixed state_stack 60 70 "잘부탁해요" :w 200 :h 150 :panel panel3)
+	  (sdl2:with-event-loop (:method :poll)
+	    (:idle ()
+		   (let* ((dt (- (sdl2:get-ticks) current-time)))
+		     (format t "~A~%" dt)
+		     (sdl2:set-render-draw-color renderer 0 0 0 255)
+		     (sdl2:render-clear renderer)
+		     (sdl2:set-render-draw-color renderer 255 255 255 255)
+
+		     (update-gui state_stack dt)
+		     (render-gui state_stack renderer)
+
+		     (sdl2:render-present renderer)
+
+		     (setf current-time (sdl2:get-ticks))
+		     (sdl2:delay 25)
+		     ))
+	    (:quit ()
+		   (sdl2-ffi.functions:sdl-stop-text-input)
+		   (sdl2:destroy-texture panel-texture)
 		   (delete-global-texture)
 		   t)))))))

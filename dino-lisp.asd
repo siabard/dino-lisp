@@ -51,4 +51,6 @@
 		:components ((:file "state")))
 	       (:module "gui"
 		:components ((:file "progress_bar")
-			     (:file "scroll_bar")))))
+			     (:file "scroll_bar")
+			     (:file "label")
+			     (:file "state_stack")))))
