@@ -39,7 +39,9 @@
 						 :current-frame 0)))
 		 (blue-panel (panel/setup panel-texture 3 3))
 		 (hello-textbox (make-textbox :font font-10 :textpanel blue-panel))
-		 (textbox (make-dialog-window 40 60 :texts '("HELLO" "안녕하세요")))
+		 (textbox (make-dialog-window 40 60 :cols 12 :rows 4
+						    :panel blue-panel
+						    :texts '("HELLO" "안녕하세요")))
 		 (up-door-teleport (action/teleport tiled-map 1 1))
 		 (down-door-teleport (action/teleport tiled-map 10 8))
 		 (keys (make-instance 'key-input))
@@ -105,6 +107,7 @@
 		       (setf current-time (sdl2:get-ticks))
 		       (sdl2:delay 8)))
 	      (:quit ()
+		     (tiled/destroy-texture tiled-map)
 		     (delete-global)
 		     t))))))))
 
