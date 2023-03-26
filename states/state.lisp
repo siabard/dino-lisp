@@ -13,6 +13,14 @@
 (defgeneric render-state (game-state renderer)
   (:documentation "Render state"))
 
+(defgeneric handle-input-state (game-state mouse keys)
+  (:documentation "handle input in states"))
+
+(defgeneric enter-state (game-state)
+  (:documentation "entering state (load)"))
+
+(defgeneric exit-state (game-state)
+  (:documentation "exit state (unload)"))
 
 (defmethod update-state (game-state dt &key keyboard mouse)
   (dolist (scene scenes)
