@@ -13,7 +13,7 @@
 (defgeneric render-state (game-state renderer)
   (:documentation "Render state"))
 
-(defgeneric handle-input-state (game-state mouse keys)
+(defgeneric handle-input-state (game-state &key mouse keyboard)
   (:documentation "handle input in states"))
 
 (defgeneric enter-state (game-state)

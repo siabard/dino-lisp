@@ -2,13 +2,21 @@
 
 (defclass state-stack (gui)
   ((guis :initarg :guis
-	 :accessor guis)))
+	 :accessor guis)
+   (states :initarg :states
+	   :accessor states)))
 
 
 (defmethod update-gui ((gui state-stack) dt)
   (dolist (item (guis gui))
-    (update-gui item dt)))
+    (update-gui item dt))
+  (dolist (state (states gui))
+    (update-state state dt :keyboard nil :mouse nil)))
 
+
+(defmethod handle-input-gui ((gui state-stack) &key keyboard mouse)
+  (dolist (state (states gui))
+    (handle-input-state state :keyboard keyboard :mouse mouse)))
 
 (defmethod render-gui ((gui state-stack) renderer)
   (dolist (item (guis gui))
@@ -23,5 +31,5 @@
     (push dialog (guis gui))))
 
 
-(defun make-state-stack ()
-  (make-instance 'state-stack :guis nil))
+(defun make-state-stack (&key guis states)
+  (make-instance 'state-stack :guis guis :states states))

@@ -29,13 +29,17 @@
   (let* ((hero (hero state))
 	 (mapdata (mapdata state))
 	 (triggers (triggers state)))
-    (entity/update-input hero keyboard mouse)
+    (when (and keyboard mouse)
+      (entity/update-input hero keyboard mouse))
     (entity/pre-update-dt hero)
     (entity/collide-with-tiled-map hero mapdata)
     (entity/update-dt hero dt)
     (let ((action (trigger/get-enter-action-with-map-and-entity triggers mapdata hero)))
       (when action (funcall action hero)))))
 
+
+(defmethod handle-input-state ((state explore-state) &key keyboard mouse)
+  (entity/update-input (hero state) keyboard mouse))
 
 (defmethod render-state ((state explore-state) renderer)
   (let* ((hero (hero state))

@@ -25,3 +25,9 @@
 (defmethod set-pos-gui (gui new-x new-y)
   (setf (x gui) new-x)
   (setf (y gui) new-y))
+
+
+;; 입력 (키, 마우스 처리)
+
+(defgeneric handle-input-gui (gui &key keyboard mouse)
+  (:documentation "키보드 / 마우스 처리"))
