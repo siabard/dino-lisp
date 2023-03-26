@@ -1,6 +1,6 @@
 (in-package #:dino-lisp)
 
-(defclass game-state ()
+(defclass game-state (gui)
   ((scenes :initarg :scenes
 	   :accessor scenes)))
 
@@ -30,3 +30,12 @@
 (defmethod render-state (game-state renderer)
   (dolist (scene (scenes game-state))
     (render-scene scene renderer)))
+
+
+;; gui에서 받은 것
+(defmethod update-gui ((gui game-state) dt)
+  (update-state gui dt :keyboard nil :mouse nil))
+
+
+(defmethod render-gui ((gui game-state) renderer)
+  (render-gui gui renderer))

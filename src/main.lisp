@@ -201,10 +201,10 @@
 			 (update-mouses mouse-state)
 			 (sdl2:render-clear renderer)
 
-			 (update-state explore-state dt
-				       :keyboard keys
-				       :mouse :mouse-state)
-			 (render-state explore-state renderer)
+			 (panel/update blue-panel dt)
+			 (update-gui explore-state dt)
+			 (handle-input-state explore-state :keyboard keys :mouse mouse-state)
+			 (render-gui explore-state renderer)
 			 (panel/render blue-panel renderer 50 50 120 120)
 			 (textbox/render hello-textbox renderer 150 150 200 200)
 			 (render-dialog-window textbox :renderer renderer)

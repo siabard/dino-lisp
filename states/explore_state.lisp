@@ -56,3 +56,9 @@
       (tiled/goto mapdata cam-x cam-y)
       (tiled/render renderer mapdata (sdl2:make-rect 0 0 camera-width camera-height))
       (entity/render hero renderer cam-x cam-y))))
+
+(defmethod update-gui ((gui explore-state) dt)
+  (update-state gui dt :keyboard nil :mouse nil))
+
+(defmethod render-gui ((gui explore-state) renderer)
+  (render-state gui renderer))
