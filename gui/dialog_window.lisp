@@ -155,3 +155,10 @@
   (let ((choice-dialog (choice gui)))
     (when choice-dialog
       (process-key-event choice-dialog scancode))))
+
+
+(defmethod handle-input-gui ((gui dialog-window) &key keyboard mouse)
+  (when (key-pressed-p keyboard (sdl2:scancode-key-to-value :scancode-space))
+    (onclick-dialog-window gui (lambda (x) nil)))
+  (when (next-method-p)
+    (call-next-method gui :keyboard keyboard :mouse mouse)))

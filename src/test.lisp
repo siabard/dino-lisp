@@ -94,10 +94,10 @@
 						     (concatenate 'string a b))
 						   input-text))))
 		   (sdl2:render-present renderer)
-	    (:quit ()
-		   (sdl2-ffi.functions:sdl-stop-text-input)
-		   (delete-global-texture)
-		   t))))))))
+		   (:quit ()
+			  (sdl2-ffi.functions:sdl-stop-text-input)
+			  (delete-global-texture)
+			  t))))))))
 
 
 (defun test/dialog-test ()
@@ -120,34 +120,37 @@
 								     :dest-rect (sdl2:make-rect 94 104 16 16))
 						:texts long-texts))
 	       (test-dialog2 (make-dialog-window 90 300
-						:cols 12 :rows 4
-						:title "테스트"
-						:panel (panel/setup panel-texture 3 3)
-						:avatar (make-sprite :texture char-texture
-								     :source-rect (sdl2:make-rect 0 0 16 16)
-								     :dest-rect (sdl2:make-rect 94 104 16 16))
-						:texts long-texts))
+						 :cols 12 :rows 4
+						 :title "테스트"
+						 :panel (panel/setup panel-texture 3 3)
+						 :avatar (make-sprite :texture char-texture
+								      :source-rect (sdl2:make-rect 0 0 16 16)
+								      :dest-rect (sdl2:make-rect 94 104 16 16))
+						 :texts long-texts))
 	       (test-dialog3 (make-dialog-window 290 180
-						:cols 12 :rows 4
-						:title "테스트"
-						:panel (panel/setup panel-texture 3 3)
-						:avatar (make-sprite :texture char-texture
-								     :source-rect (sdl2:make-rect 0 0 16 16)
-								     :dest-rect (sdl2:make-rect 94 104 16 16))
-						:texts long-texts
-						:choice (make-choice-dialog 50 50
-					   :datasource (list label-1 label-2)
-					   :item-width 80
-					   :item-height 16
-					   :cursor (make-sprite :texture cursor-texture
-								:source-rect (sdl2:make-rect 0 0 9 9)
-								:dest-rect (sdl2:make-rect 0 0 9 9))
-					   :columns 2
-					   :display-start 0
-					   :display-rows 2)))
-	       (current-time (sdl2:get-ticks)))
+						 :cols 12 :rows 4
+						 :title "테스트"
+						 :panel (panel/setup panel-texture 3 3)
+						 :avatar (make-sprite :texture char-texture
+								      :source-rect (sdl2:make-rect 0 0 16 16)
+								      :dest-rect (sdl2:make-rect 94 104 16 16))
+						 :texts long-texts
+						 :choice (make-choice-dialog 50 50
+									     :datasource (list label-1 label-2)
+									     :item-width 80
+									     :item-height 16
+									     :cursor (make-sprite :texture cursor-texture
+												  :source-rect (sdl2:make-rect 0 0 9 9)
+												  :dest-rect (sdl2:make-rect 0 0 9 9))
+									     :columns 2
+									     :display-start 0
+									     :display-rows 2)))
+	       (current-time (sdl2:get-ticks))
+	       (keyboard (make-instance 'key-input))
+	       (mouse    (make-mouse-system)))
 	  (init-font "ascii"  (uiop:merge-pathnames* "assets/ascii.png" *application-root*))
 	  (init-font "hangul" (uiop:merge-pathnames* "assets/hangul.png" *application-root*))
+	  (init-keys keyboard)
 
 	  (sdl2:with-event-loop (:method :poll)
 	    (:mousebuttondown ()
@@ -156,6 +159,10 @@
 						       (when (< (index dialog)
 								(- (length (texts dialog)) 1))
 							 (incf (index dialog))))))
+	    (:keydown (:keysym keysym)
+		      (keydown-event keyboard (sdl2:scancode-value keysym)))
+	    (:keyup (:keysym keysym)
+		    (keyup-event keyboard (sdl2:scancode-value keysym)))
 	    (:idle ()
 		   (let* ((dt (- (sdl2:get-ticks) current-time)))
 		     (sdl2:set-render-draw-color renderer 0 0 0 255)
@@ -166,12 +173,14 @@
 		     ;;(update-gui test-dialog2 dt)
 		     (update-gui test-dialog3 dt)
 
+		     (handle-input-gui test-dialog3 :keyboard keyboard :mouse mouse)
 		     ;;(render-dialog-window test-dialog :renderer renderer)
 		     ;;(render-dialog-window test-dialog2 :renderer renderer)
 		     (render-dialog-window test-dialog3 :renderer renderer)
 
 		     (sdl2:render-present renderer)
 		     (setf current-time (sdl2:get-ticks))
+		     (clear-keys keyboard)
 		     (sdl2:delay 25)))
 	    (:quit ()
 		   (sdl2-ffi.functions:sdl-stop-text-input)
@@ -183,7 +192,7 @@
 
 
 (defun test/choice-select ()
-   (sdl2:with-init (:video)
+  (sdl2:with-init (:video)
     (sdl2:with-window (win :title "text input" :w 640 :h 480)
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(let* ((label-1 (make-label 0 0 "레이블 1"))
@@ -276,7 +285,7 @@
 
 
 (defun test/progress-bar ()
-   (sdl2:with-init (:everything)
+  (sdl2:with-init (:everything)
     (sdl2:with-window (win :title "progress-bar" :w 640 :h 480)
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(let* ((bar-texture (load-texture renderer (uiop:merge-pathnames* "assets/progress_bar.png" *application-root*)))
@@ -311,18 +320,18 @@
 
 
 (defun test/scroll-bar ()
-   (sdl2:with-init (:everything)
+  (sdl2:with-init (:everything)
     (sdl2:with-window (win :title "scroll-bar" :w 640 :h 480)
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(let* ((bar-texture (load-texture renderer (uiop:merge-pathnames* "assets/scrollbar.png" *application-root*)))
 	       (hpbar (make-scroll-bar bar-texture
-					 :x 100
-					 :y 100
-					 :w 18
-					 :h 120
-					 :atlas  (make-tile-atlas bar-texture 18 18)
-					 :value 20
-					 :max-value 100))
+				       :x 100
+				       :y 100
+				       :w 18
+				       :h 120
+				       :atlas  (make-tile-atlas bar-texture 18 18)
+				       :value 20
+				       :max-value 100))
 
 	       )
 	  (sdl2:with-event-loop (:method :poll)
@@ -345,7 +354,7 @@
 		   t)))))))
 
 (defun test/stack-state ()
-   (sdl2:with-init (:everything)
+  (sdl2:with-init (:everything)
     (sdl2:with-window (win :title "scroll-bar" :w 640 :h 480)
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(let* ((panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))

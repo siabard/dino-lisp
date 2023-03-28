@@ -37,5 +37,4 @@
   (let ((key-list (mapcar #'sdl2:scancode-key-to-value '(:scancode-up :scancode-down :scancode-left :scancode-right))))
     (dolist (scancode key-list)
       (when (key-pressed-p keyboard scancode)
-	(format nil "process ~A~%" scancode)
 	(process-key-event gui scancode)))))
