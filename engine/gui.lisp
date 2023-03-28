@@ -31,3 +31,11 @@
 
 (defgeneric handle-input-gui (gui &key keyboard mouse)
   (:documentation "키보드 / 마우스 처리"))
+
+
+(defmethod handle-input-gui (gui &key keyboard mouse)
+  (let ((key-list (mapcar #'sdl2:scancode-key-to-value '(:scancode-up :scancode-down :scancode-left :scancode-right))))
+    (dolist (scancode key-list)
+      (when (key-pressed-p keyboard scancode)
+	(format nil "process ~A~%" scancode)
+	(process-key-event gui scancode)))))

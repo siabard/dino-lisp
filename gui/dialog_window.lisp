@@ -30,7 +30,8 @@
 ;; cols, rows 가 0 이라면 각각 가능한 전체 크기에 들어갈 수 있는 크기를 사용한다.
 ;; (*logical-width* - x) / 16, (*logical-height* - y) / 16
 ;; 일단 화면의 최대 크기를 이용한다. (global의 값 이용)
-;; cols ㅁㄴ
+;; dinodeck에서는 textbox 라고 했던 것
+
 (defun make-dialog-window (x y &key (cols (/ (- *logical-width* x) 16)) (rows (/ (- *logical-height* y) 16)) title texts panel avatar choice)
   (let* ((chunked-texts (chunk-text texts cols rows))
 	 (texts-length (length chunked-texts))
@@ -100,7 +101,7 @@
   (let* ((x (+ 0 (x dialog-window)))
 	 (y (+ 0 (y dialog-window)))
 	 (w (+ 0 (w dialog-window)))
-	 (h (+ 0 (h dialog-window)))
+	 (h (+ 120 (h dialog-window)))
 	 (title (title dialog-window))
 	 (texts (texts dialog-window))
 	 (current-texts (elt texts (index dialog-window)))
@@ -108,7 +109,8 @@
 	 (avatar-width (cond (avatar  (sdl2:rect-width (sprite-dest-rect avatar)))
 			     (t 0)))
 	 (panel (panel dialog-window))
-	 (panel-tween-end (tween/end-p (panel-struct-tween (panel dialog-window)))))
+	 (panel-tween-end (tween/end-p (panel-struct-tween (panel dialog-window))))
+	 (choice-dialog (choice dialog-window)))
     ;; 배경 패널 그리기
     (panel/render panel renderer x y w h)
     ;; 타이틀 있으면 타이틀 쓰기
@@ -130,7 +132,11 @@
 			(cond ((eq nil title) 8)
 			      (t 28)))
 		     text)
-	(incf y 16)))))
+	(incf y 16))
+      ;; choice
+      (when choice-dialog
+	(render-gui choice-dialog renderer))
+      )))
 
 (defmethod update-gui ((gui dialog-window) dt)
   (panel/update (panel gui) dt))
@@ -144,3 +150,8 @@
 
 (defmethod onclick-dialog-window (dialog-window callback)
   (funcall callback dialog-window))
+
+(defmethod process-key-event ((gui dialog-window) scancode)
+  (let ((choice-dialog (choice gui)))
+    (when choice-dialog
+      (process-key-event choice-dialog scancode))))

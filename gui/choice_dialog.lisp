@@ -196,19 +196,19 @@
 
 (defmethod process-key-event ((gui choice-dialog) scancode)
   (cond ((sdl2:scancode= scancode
-			 :scancode-up)
+			 (sdl2:scancode-key-to-value :scancode-up))
 	 (choice/move-up gui))
 	((sdl2:scancode= scancode
-			 :scancode-down)
+			 (sdl2:scancode-key-to-value :scancode-down))
 	 (choice/move-down gui))
 	((sdl2:scancode= scancode
-			 :scancode-left)
+			 (sdl2:scancode-key-to-value :scancode-left))
 	 (choice/move-left gui))
 	((sdl2:scancode= scancode
-			 :scancode-right)
+			 (sdl2:scancode-key-to-value :scancode-right))
 	 (choice/move-right gui))
 	((sdl2:scancode= scancode
-			 :scancode-space)
+			 (sdl2:scancode-key-to-value :scancode-space))
 	 (choice/on-click gui))))
 
 (defmethod render-height ((gui choice-dialog))

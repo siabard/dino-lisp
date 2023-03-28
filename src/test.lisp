@@ -108,6 +108,9 @@
 			     "물론 이런 정책이 늘 있는 것은 아니지만 캐릭터간의 대화는 당연히 잘려야하지 않을가요?"))
 	       (panel-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
 	       (char-texture (load-texture renderer (uiop:merge-pathnames* "assets/mychar.png" *application-root*)))
+	       (label-1 (make-label 0 0 "레이블 1"))
+	       (label-2 (make-label 0 0 "레이블 2"))
+	       (cursor-texture (load-texture renderer (uiop:merge-pathnames* "assets/panel.png" *application-root*)))
 	       (test-dialog (make-dialog-window 90 100
 						:cols 12 :rows 4
 						:title "테스트"
@@ -124,14 +127,24 @@
 								     :source-rect (sdl2:make-rect 0 0 16 16)
 								     :dest-rect (sdl2:make-rect 94 104 16 16))
 						:texts long-texts))
-	       (test-dialog3 (make-dialog-window 290 300
+	       (test-dialog3 (make-dialog-window 290 180
 						:cols 12 :rows 4
 						:title "테스트"
 						:panel (panel/setup panel-texture 3 3)
 						:avatar (make-sprite :texture char-texture
 								     :source-rect (sdl2:make-rect 0 0 16 16)
 								     :dest-rect (sdl2:make-rect 94 104 16 16))
-						:texts long-texts))
+						:texts long-texts
+						:choice (make-choice-dialog 50 50
+					   :datasource (list label-1 label-2)
+					   :item-width 80
+					   :item-height 16
+					   :cursor (make-sprite :texture cursor-texture
+								:source-rect (sdl2:make-rect 0 0 9 9)
+								:dest-rect (sdl2:make-rect 0 0 9 9))
+					   :columns 2
+					   :display-start 0
+					   :display-rows 2)))
 	       (current-time (sdl2:get-ticks)))
 	  (init-font "ascii"  (uiop:merge-pathnames* "assets/ascii.png" *application-root*))
 	  (init-font "hangul" (uiop:merge-pathnames* "assets/hangul.png" *application-root*))
@@ -149,12 +162,12 @@
 		     (sdl2:render-clear renderer)
 		     (sdl2:set-render-draw-color renderer 255 255 255 255)
 
-		     (update-gui test-dialog dt)
-		     (update-gui test-dialog2 dt)
+		     ;;(update-gui test-dialog dt)
+		     ;;(update-gui test-dialog2 dt)
 		     (update-gui test-dialog3 dt)
 
-		     (render-dialog-window test-dialog :renderer renderer)
-		     (render-dialog-window test-dialog2 :renderer renderer)
+		     ;;(render-dialog-window test-dialog :renderer renderer)
+		     ;;(render-dialog-window test-dialog2 :renderer renderer)
 		     (render-dialog-window test-dialog3 :renderer renderer)
 
 		     (sdl2:render-present renderer)
@@ -164,12 +177,13 @@
 		   (sdl2-ffi.functions:sdl-stop-text-input)
 		   (sdl2:destroy-texture panel-texture)
 		   (sdl2:destroy-texture char-texture)
+		   (sdl2:destroy-texture cursor-texture)
 		   (delete-global-texture)
 		   t)))))))
 
 
 (defun test/choice-select ()
-   (sdl2:with-init (:everything)
+   (sdl2:with-init (:video)
     (sdl2:with-window (win :title "text input" :w 640 :h 480)
       (sdl2:with-renderer (renderer win :flags '(:accelerated :targettexture :presentvsync))
 	(let* ((label-1 (make-label 0 0 "레이블 1"))
@@ -190,23 +204,38 @@
 								:dest-rect (sdl2:make-rect 0 0 9 9))
 					   :columns 2
 					   :display-start 0
-					   :display-rows 2)))
+					   :display-rows 2))
+	       (keyboard (make-instance 'key-input))
+	       (mouse    (make-mouse-system)))
 	  (init-font "ascii"  "assets/ascii.png")
 	  (init-font "hangul" "assets/hangul.png")
+	  (init-keys keyboard)
 	  (sdl2:with-event-loop (:method :poll)
-	    (:mousebuttondown ())
+	    (:mousebuttonup (:button button)
+			    (cond ((= button 1)
+				   (setf (mouse-system-button-l mouse) nil))
+				  ((= button 3)
+				   (setf (mouse-system-button-r mouse) nil))))
+	    (:mousebuttondown (:button button)
+			      (cond ((= button 1)
+				     (setf (mouse-system-button-l mouse) nil))
+				    ((= button 3)
+				     (setf (mouse-system-button-r mouse) nil))))
 	    (:keydown (:keysym keysym)
-		      (process-key-event dialog
-					 (sdl2:scancode-value keysym)))
+		      (keydown-event keyboard (sdl2:scancode-value keysym)))
+	    (:keyup (:keysym keysym)
+		    (keyup-event keyboard (sdl2:scancode-value keysym)))
 	    (:idle ()
 		   (sdl2:set-render-draw-color renderer 0 0 0 255)
 		   (sdl2:render-clear renderer)
 		   (sdl2:set-render-draw-color renderer 255 255 255 255)
+		   (handle-input-gui dialog :mouse mouse :keyboard keyboard)
 
 		   (render-gui dialog renderer)
 
 
 		   (sdl2:render-present renderer)
+		   (clear-keys keyboard)
 		   (sdl2:delay 40))
 	    (:quit ()
 		   (sdl2-ffi.functions:sdl-stop-text-input)
