@@ -7,6 +7,10 @@
       :accessor x)
    (y :initarg :y
       :accessor y)
+   (terminated :initarg :terminated
+	       :accessor terminated)
+   (blocked :initarg :blocked
+	    :accessor blocked)
    (zoom :initarg :zoom
 	 :accessor zoom)
    (width :initarg :width
@@ -15,6 +19,8 @@
 	   :accessor height)
    (background :initarg :background
 	       :accessor background)
+   (timer :initarg :timer
+	  :accessor timer)
    (guis :initarg :guis
 	 :accessor guis)
    (entities :initarg :entities
@@ -22,27 +28,26 @@
    (camera :initarg :camera
 	   :accessor camera)))
 
-(defun make-scene (name &key (x 0) (y 0) (zoom 1) (width 100) (height 100) (background nil) (camera nil) (guis nil) (entities nil))
-  (make-instance 'scene
-		 :name name
-		 :x x
-		 :y y
-		 :width width
-		 :height height
-		 :zoom zoom
-		 :background background
-		 :entities entities
-		 :guis guis
-		 :camera camera))
-
-;; entity 처리
-
-
-;; gui 처리
-
-
-
-
+(defun make-scene (name &key (x 0) (y 0) (zoom 1) (width 100) (height 100) (background nil) (camera nil) (guis nil) (entities nil) (timer 0) (blocked nil))
+  (let ((timer (when (> 0 timer)
+		 (make-tween :start 0
+			     :end 1
+			     :timespan timer
+			     :current-time 0
+			     :running T))))
+    (make-instance 'scene
+		   :name name
+		   :x x
+		   :y y
+		   :timer timer
+		   :width width
+		   :height height
+		   :zoom zoom
+		   :blocked blocked
+		   :background background
+		   :entities entities
+		   :guis guis
+		   :camera camera)))
 
 (defgeneric update-scene (scene dt &key keyboard mouse)
   (:documentation "update all entities in scene"))
@@ -52,10 +57,16 @@
 
 
 (defmethod update-scene (scene dt &key keyboard mouse)
+  (when (timer scene)
+    (tween/update-dt (timer scene) dt)
+    (when (tween/end-p (timer scene))
+      (setf (terminated scene) T)))
   (dolist (entity (entities scene))
     (entity/update-input entity keyboard mouse)
     (entity/pre-update-dt entity)
-    (entity/update-dt entity dt)))
+    (entity/update-dt entity dt))
+  (dolist (gui (guis scene))
+    (update-gui gui dt)))
 
 
 ;;; 렌더링용 texture을 만들어서

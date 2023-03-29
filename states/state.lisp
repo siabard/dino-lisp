@@ -23,8 +23,11 @@
   (:documentation "exit state (unload)"))
 
 (defmethod update-state (game-state dt &key keyboard mouse)
-  (dolist (scene scenes)
-    (update-scene scene dt :keyboard keyboard :mouse mouse)))
+  (dolist (scene (scenes game-state))
+    (update-scene scene dt :keyboard keyboard :mouse mouse)
+    (when (blocked scene)
+      (return)))
+  (setf (scenes game-state) (remove-if #'terminated (scenes game-state))))
 
 
 (defmethod render-state (game-state renderer)
