@@ -277,13 +277,6 @@
 	    ))))))
 
 
-(cffi:defcfun memset :pointer
-  (ptr :pointer)
-  (val :int)
-  (size :int))
-
-
-
 ;; (let ((vec (cffi:make-shareable-byte-vector 256)))
 ;;   (cffi:with-pointer-to-vector-data (ptr vec)
 ;;     (memset ptr 0 (length vec))))
