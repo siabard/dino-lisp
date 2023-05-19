@@ -31,7 +31,7 @@
 							   :new-y 0
 							   :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
 							   :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
-							   :maxspeed 40)
+							   :maxspeed 350)
 				    :animatable (make-animatable
 						 :elapsed-time 0
 						 :animation-span 30
@@ -105,7 +105,7 @@
 		       (sdl2:render-present renderer)
 		       (clear-keys keys)
 		       (setf current-time (sdl2:get-ticks))
-		       (sdl2:delay 8)))
+		       (sdl2:delay 16)))
 	      (:quit ()
 		     (tiled/destroy-texture tiled-map)
 		     (delete-global)
