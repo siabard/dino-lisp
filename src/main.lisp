@@ -105,7 +105,7 @@
 		       (sdl2:render-present renderer)
 		       (clear-keys keys)
 		       (setf current-time (sdl2:get-ticks))
-		       (sdl2:delay 16)))
+		       (sdl2:delay 4)))
 	      (:quit ()
 		     (tiled/destroy-texture tiled-map)
 		     (delete-global)
