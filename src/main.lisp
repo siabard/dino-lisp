@@ -11,8 +11,8 @@
 	  (setf *renderer* renderer)
 	  (sdl2-image:init '(:jpg :png))
 	  (sdl2-ttf:init)
-	  (init-font "ascii"  "assets/ascii.png")
-	  (init-font "hangul" "assets/hangul.png")
+	  (init-font "ascii"  (uiop:merge-pathnames* "assets/ascii.png" *application-root*))
+	  (init-font "hangul" (uiop:merge-pathnames*  "assets/hangul.png" *application-root*))
 
 	  (let* ((current-time (sdl2:get-ticks))
 		 (font-10 (sdl2-ttf:open-font (uiop:merge-pathnames* "assets/notokr-regular.ttf" *application-root*) 14))
@@ -105,7 +105,8 @@
 		       (sdl2:render-present renderer)
 		       (clear-keys keys)
 		       (setf current-time (sdl2:get-ticks))
-		       (sdl2:delay 4)))
+		       (when (> (- 16 dt) 0)
+			 (sdl2:delay (- 16 dt)))))
 	      (:quit ()
 		     (tiled/destroy-texture tiled-map)
 		     (delete-global)
@@ -141,8 +142,8 @@
 							   :y 0
 							   :new-x 0
 							   :new-y 0
-							   :dx (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
-							   :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil)
+							   :dx (make-tween :start 0 :end 400 :timespan 0 :current-time 0 :running nil)
+							   :dy (make-tween :start 0 :end 400 :timespan 0 :current-time 0 :running nil)
 							   :maxspeed 40)
 				    :animatable (make-animatable
 						 :elapsed-time 0
