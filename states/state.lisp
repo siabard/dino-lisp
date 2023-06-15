@@ -27,18 +27,11 @@
     (update-scene scene dt :keyboard keyboard :mouse mouse)
     (when (blocked scene)
       (return)))
-  (setf (scenes game-state) (remove-if #'terminated (scenes game-state))))
+  (setf (scenes game-state)
+	(remove-if (lambda (scene) (terminated scene))
+		   (scenes game-state))))
 
 
 (defmethod render-state (game-state renderer)
   (dolist (scene (scenes game-state))
     (render-scene scene renderer)))
-
-
-;; gui에서 받은 것
-(defmethod update-gui ((gui game-state) dt)
-  (update-state gui dt :keyboard nil :mouse nil))
-
-
-(defmethod render-gui ((gui game-state) renderer)
-  (render-gui gui renderer))

@@ -28,7 +28,7 @@
    (camera :initarg :camera
 	   :accessor camera)))
 
-(defun make-scene (name &key (x 0) (y 0) (zoom 1) (width 100) (height 100) (background nil) (camera nil) (guis nil) (entities nil) (timer 0) (blocked nil))
+(defun make-scene (name &key (x 0) (y 0) (zoom 1) (width 100) (height 100) (background nil) (camera nil) (guis nil) (entities nil) (timer 0) (blocked nil) (terminated nil))
   (let ((timer (when (> 0 timer)
 		 (make-tween :start 0
 			     :end 1
@@ -44,6 +44,7 @@
 		   :height height
 		   :zoom zoom
 		   :blocked blocked
+		   :terminated terminated
 		   :background background
 		   :entities entities
 		   :guis guis

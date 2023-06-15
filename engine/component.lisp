@@ -1,6 +1,6 @@
 (in-package #:dino-lisp)
 
-(defstruct movable speed maxspeed x y dx dy new-x new-y)
+(defstruct movable  (speed 0) (maxspeed 0) (x 0) (y 0) (dx 0) (dy 0) (new-x 0) (new-y 0))
 
 (defstruct animatable
   animation-span
