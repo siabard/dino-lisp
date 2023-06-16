@@ -18,3 +18,8 @@
 ;;; typep를 이용해서 타입의 동일성을 검증할 수 있다.
 ;;; (typep (make-movable) 'movable) -> T
 ;;; (typep (make-movable) 'animatable) -> T
+
+
+(defun add-animation (animatable name frames)
+  (let ((animation-map (animatable-animation-map animatable)))
+    (setf (gethash name animation-map) frames)))
