@@ -30,7 +30,7 @@
 							      :dy (make-tween :start 0 :end 0 :timespan 0 :current-time 0 :running nil))
 				       :animatable (make-animatable
 						    :elapsed-time 0
-						    :animation-span 30
+						    :animation-span 60
 						    :current-animation ""
 						    :current-frame 0))))
 	      (entity/make-entity-atlas entity)
@@ -91,19 +91,19 @@
 	    (:keydown (:keysym keysym)
 		      (keydown-event keys (sdl2:scancode-value keysym)))
 	    (:idle ()
+		   (setf start-tick (sdl2:get-ticks))
+		   (setf dt (- start-tick end-tick))
+		   (setf end-tick start-tick)
 		   (cond ((eql states nil) (sdl2:push-event :quit))
 			 (t
 			  (progn
-			    (setf start-tick (sdl2:get-ticks))
 			    (sdl2:set-render-draw-color renderer 0 0 0 255)
 			    (sdl2:render-clear renderer)
 			    (update-state intro-state dt :mouse mouse-state :keyboard keys)
 			    (render-state intro-state renderer)
-			    (sdl2:render-present renderer)
-			    (when (< dt 33)
-			      (sdl2:delay (- 33 dt))))))
-		   (setf end-tick (sdl2:get-ticks))
-		   (setf dt (- end-tick start-tick)))
+			    (sdl2:render-present renderer))))
+		   (when (< dt 2)
+		     (sdl2:delay (- 2 dt))))
 	    (:quit ()
 		   (format t "BYE")
 		   (sdl2:destroy-texture texture)
