@@ -23,3 +23,8 @@
 ;;; rect logical->physical
 (defun rect/logical->physical (x y w h &key (sx 1) (sy 1))
   (values (* x sx) (* y sy) (* w sx) (* h sy)))
+
+
+;; rect physical->logical
+(defun rect/physical->logical (x y w h &key (sx 1) (sy 1))
+  (values (floor x sx) (floor y sy) (floor w sx) (floor h sy)))
